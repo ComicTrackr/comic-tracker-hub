@@ -83,7 +83,7 @@ export const SearchBar = () => {
       {analysisResult && (
         <ComicAnalysisResult 
           result={analysisResult}
-          onAddToCollection={(isGraded) => addToCollection(analysisResult, isGraded)}
+          onAddToCollection={addToCollection}
           onNewSearch={handleNewSearch}
         />
       )}
