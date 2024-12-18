@@ -20,7 +20,7 @@ const Login = () => {
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN') {
+      if (session) {
         try {
           const { data, error } = await supabase.functions.invoke('create-checkout');
           
@@ -49,8 +49,6 @@ const Login = () => {
           });
           navigate("/dashboard");
         }
-      } else if (event === 'USER_UPDATED' || (event === 'SIGNED_IN' && session)) {
-        navigate("/dashboard");
       }
     });
 
