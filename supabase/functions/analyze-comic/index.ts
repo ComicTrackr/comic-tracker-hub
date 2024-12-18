@@ -23,30 +23,24 @@ serve(async (req) => {
     let prompt, result
 
     if (image) {
-      prompt = `You are a comic book expert specializing in eBay market analysis. For this comic cover image, provide a detailed analysis focusing EXCLUSIVELY on eBay's recently sold listings from the last 30 days:
+      prompt = `You are a comic book expert specializing in eBay market analysis. For this comic cover image, provide a detailed analysis focusing EXCLUSIVELY on eBay's recently sold listings from the last 30 days.
 
-      1. The exact title and issue number
-      2. Current market values based ONLY on eBay completed sales from the last 30 days:
-         - For CGC 9.8 copies: Calculate the average price from the last 3-5 actual CGC 9.8 sales on eBay. If no 9.8 sales exist, use 9.6 and add 20% to estimate 9.8 value
-         - For ungraded Near Mint copies: Calculate the average price from the last 3-5 actual raw copy sales on eBay in NM condition
-      3. For graded copies: Find the highest and lowest recent sale prices, including their grades
-      4. For ungraded copies: Find the highest and lowest recent sale prices, including their conditions
-      
-      IMPORTANT GUIDELINES:
-      - Only use actual eBay completed sales from the last 30 days
-      - For CGC 9.8: If insufficient recent 9.8 sales exist, use next highest grade and add 20-30% premium
-      - For raw copies, only consider listings that specifically mention Near Mint or NM condition
-      - Exclude outlier prices that are significantly higher or lower than the average
-      - CGC 9.8 values should typically be 2-3x higher than raw NM copies
-      - For modern comics (last 5 years), focus on the most recent sales as prices can fluctuate rapidly
-      
-      Format your response exactly like this:
+      Format your response EXACTLY like this, including the exact labels and maintaining the structure:
+
       Title: [Comic Title and Issue Number]
-      GradedValue: [Average price of recent CGC 9.8 sales on eBay, should be 2-3x higher than ungraded]
-      UngradedValue: [Average price of recent NM raw copy sales on eBay]
-      RecentGradedSales: [Highest graded sale: Grade, Price] | [Lowest graded sale: Grade, Price]
-      RecentUngradedSales: [Highest raw sale: Condition, Price] | [Lowest raw sale: Condition, Price]
-      Analysis: [Market trends and value justification]`
+      GradedValue: [Numeric value only, e.g. 150]
+      UngradedValue: [Numeric value only, e.g. 50]
+      RecentGradedSales: Highest: [Grade] $[Price] | Lowest: [Grade] $[Price]
+      RecentUngradedSales: Highest: [Condition] $[Price] | Lowest: [Condition] $[Price]
+      Analysis: [2-3 sentences about market trends]
+
+      Guidelines:
+      - For GradedValue: Use average CGC 9.8 price. If no 9.8s, use 9.6 price + 20%
+      - For UngradedValue: Use average NM raw copy price
+      - Only use actual eBay completed sales from last 30 days
+      - Values must be numbers only, no text or symbols
+      - Sales ranges must follow the exact format shown above
+      - If no sales data available, use "No recent sales data" for that category`
 
       try {
         console.log('Processing image...');
@@ -74,30 +68,24 @@ serve(async (req) => {
         throw new Error('Failed to process image: ' + imageError.message);
       }
     } else if (searchQuery) {
-      prompt = `You are a comic book expert specializing in eBay market analysis. For the comic "${searchQuery}", provide a detailed analysis focusing EXCLUSIVELY on eBay's recently sold listings from the last 30 days:
+      prompt = `You are a comic book expert specializing in eBay market analysis. For the comic "${searchQuery}", provide a detailed analysis focusing EXCLUSIVELY on eBay's recently sold listings from the last 30 days.
 
-      1. The exact title and issue number
-      2. Current market values based ONLY on eBay completed sales from the last 30 days:
-         - For CGC 9.8 copies: Calculate the average price from the last 3-5 actual CGC 9.8 sales on eBay. If no 9.8 sales exist, use 9.6 and add 20% to estimate 9.8 value
-         - For ungraded Near Mint copies: Calculate the average price from the last 3-5 actual raw copy sales on eBay in NM condition
-      3. For graded copies: Find the highest and lowest recent sale prices, including their grades
-      4. For ungraded copies: Find the highest and lowest recent sale prices, including their conditions
-      
-      IMPORTANT GUIDELINES:
-      - Only use actual eBay completed sales from the last 30 days
-      - For CGC 9.8: If insufficient recent 9.8 sales exist, use next highest grade and add 20-30% premium
-      - For raw copies, only consider listings that specifically mention Near Mint or NM condition
-      - Exclude outlier prices that are significantly higher or lower than the average
-      - CGC 9.8 values should typically be 2-3x higher than raw NM copies
-      - For modern comics (last 5 years), focus on the most recent sales as prices can fluctuate rapidly
-      
-      Format your response exactly like this:
+      Format your response EXACTLY like this, including the exact labels and maintaining the structure:
+
       Title: [Comic Title and Issue Number]
-      GradedValue: [Average price of recent CGC 9.8 sales on eBay, should be 2-3x higher than ungraded]
-      UngradedValue: [Average price of recent NM raw copy sales on eBay]
-      RecentGradedSales: [Highest graded sale: Grade, Price] | [Lowest graded sale: Grade, Price]
-      RecentUngradedSales: [Highest raw sale: Condition, Price] | [Lowest raw sale: Condition, Price]
-      Analysis: [Market trends and value justification]`
+      GradedValue: [Numeric value only, e.g. 150]
+      UngradedValue: [Numeric value only, e.g. 50]
+      RecentGradedSales: Highest: [Grade] $[Price] | Lowest: [Grade] $[Price]
+      RecentUngradedSales: Highest: [Condition] $[Price] | Lowest: [Condition] $[Price]
+      Analysis: [2-3 sentences about market trends]
+
+      Guidelines:
+      - For GradedValue: Use average CGC 9.8 price. If no 9.8s, use 9.6 price + 20%
+      - For UngradedValue: Use average NM raw copy price
+      - Only use actual eBay completed sales from last 30 days
+      - Values must be numbers only, no text or symbols
+      - Sales ranges must follow the exact format shown above
+      - If no sales data available, use "No recent sales data" for that category`
 
       result = await model.generateContent(prompt)
     } else {
@@ -106,8 +94,9 @@ serve(async (req) => {
 
     const response = await result.response
     const text = response.text()
+    console.log('Raw Gemini response:', text);
 
-    // Parse the structured response
+    // Parse the structured response with more robust regex patterns
     const titleMatch = text.match(/Title:\s*(.+?)(?=\n|$)/i)
     const gradedValueMatch = text.match(/GradedValue:\s*\$?(\d+(?:,\d+)?(?:\.\d+)?)/i)
     const ungradedValueMatch = text.match(/UngradedValue:\s*\$?(\d+(?:,\d+)?(?:\.\d+)?)/i)
@@ -115,6 +104,16 @@ serve(async (req) => {
     const recentUngradedSalesMatch = text.match(/RecentUngradedSales:\s*(.+?)(?=\n(?:[A-Za-z]+:|$))/is)
     const analysisMatch = text.match(/Analysis:\s*(.+?)(?=\n|$)/is)
 
+    console.log('Parsed matches:', {
+      titleMatch,
+      gradedValueMatch,
+      ungradedValueMatch,
+      recentGradedSalesMatch,
+      recentUngradedSalesMatch,
+      analysisMatch
+    });
+
+    // Parse numeric values with fallbacks
     const gradedValue = gradedValueMatch ? 
       parseFloat(gradedValueMatch[1].replace(/,/g, '')) : 
       0
@@ -128,14 +127,20 @@ serve(async (req) => {
 
     const analysis = {
       comic_title: titleMatch ? titleMatch[1].trim() : searchQuery,
-      graded_value: finalGradedValue,
-      ungraded_value: ungradedValue,
-      recent_graded_sales: recentGradedSalesMatch ? recentGradedSalesMatch[1].trim() : '',
-      recent_ungraded_sales: recentUngradedSalesMatch ? recentUngradedSalesMatch[1].trim() : '',
-      analysis_text: analysisMatch ? analysisMatch[1].trim() : text
+      graded_value: finalGradedValue || 0,
+      ungraded_value: ungradedValue || 0,
+      recent_graded_sales: recentGradedSalesMatch ? 
+        recentGradedSalesMatch[1].trim() : 
+        'No recent graded sales data',
+      recent_ungraded_sales: recentUngradedSalesMatch ? 
+        recentUngradedSalesMatch[1].trim() : 
+        'No recent ungraded sales data',
+      analysis_text: analysisMatch ? 
+        analysisMatch[1].trim() : 
+        'Analysis not available'
     }
 
-    console.log('Analysis completed:', analysis)
+    console.log('Final analysis object:', analysis);
 
     return new Response(
       JSON.stringify(analysis),
