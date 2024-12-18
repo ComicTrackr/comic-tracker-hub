@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { ComicAnalysisResult } from "@/components/ComicAnalysisResult";
+import { ComicAnalysisResult } from "@/types/comic";
 
 export const useComicCollection = () => {
   const { toast } = useToast();
@@ -21,7 +21,6 @@ export const useComicCollection = () => {
         return;
       }
 
-      // Save the analysis results to user_comics table with the adjusted value
       const { error } = await supabase
         .from('user_comics')
         .insert({

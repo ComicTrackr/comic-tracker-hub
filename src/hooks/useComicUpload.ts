@@ -3,7 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { analyzeComicImage, saveComicAnalysis } from "@/services/comicAnalysisService";
 import { compressImage } from "@/utils/imageCompression";
-import { ComicAnalysisResult } from "@/components/ComicAnalysisResult";
+import { ComicAnalysisResult } from "@/types/comic";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 

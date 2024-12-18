@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { ComicAnalysisResult } from "@/components/ComicAnalysisResult";
+import { ComicAnalysisResult } from "@/types/comic";
 
 export const analyzeComicImage = async (base64Image: string): Promise<ComicAnalysisResult> => {
   const { data: analysis, error } = await supabase.functions.invoke('analyze-comic', {
