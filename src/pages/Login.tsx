@@ -12,12 +12,39 @@ const Login = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if user is already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const checkAuthAndRedirect = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate("/dashboard");
+        try {
+          const { data, error } = await supabase.functions.invoke('create-checkout');
+          
+          if (error) {
+            console.error('Checkout error:', error);
+            toast({
+              title: "Error",
+              description: "Failed to initiate payment. Please try again.",
+              variant: "destructive",
+            });
+            return;
+          }
+          
+          if (data?.url) {
+            window.location.href = data.url;
+          } else {
+            navigate("/landing");
+          }
+        } catch (error) {
+          console.error('Payment error:', error);
+          toast({
+            title: "Error",
+            description: "Failed to process payment. Please try again.",
+            variant: "destructive",
+          });
+        }
       }
-    });
+    };
+
+    checkAuthAndRedirect();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session) {
@@ -31,23 +58,21 @@ const Login = () => {
               description: "Failed to initiate payment. Please try again.",
               variant: "destructive",
             });
-            navigate("/dashboard");
             return;
           }
           
           if (data?.url) {
             window.location.href = data.url;
           } else {
-            navigate("/dashboard");
+            navigate("/landing");
           }
         } catch (error) {
           console.error('Payment error:', error);
           toast({
             title: "Error",
-            description: "Failed to process payment. Redirecting to dashboard.",
+            description: "Failed to process payment. Please try again.",
             variant: "destructive",
           });
-          navigate("/dashboard");
         }
       }
     });
@@ -76,7 +101,7 @@ const Login = () => {
               }
             }}
             providers={[]}
-            redirectTo={window.location.origin}
+            redirectTo={`${window.location.origin}/landing`}
           />
         </Card>
       </div>
