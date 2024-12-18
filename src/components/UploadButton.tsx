@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useComicCollection } from "@/hooks/useComicCollection";
 import { ComicAnalysisResult } from "@/components/ComicAnalysisResult";
 import { useComicUpload } from "@/hooks/useComicUpload";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 export const UploadButton = () => {
   const { analysisResult, setAnalysisResult, addToCollection } = useComicCollection();
@@ -23,9 +23,18 @@ export const UploadButton = () => {
       return;
     }
 
-    const result = await handleFileUpload(file);
-    if (result) {
-      setAnalysisResult(result);
+    try {
+      const result = await handleFileUpload(file);
+      if (result) {
+        setAnalysisResult(result);
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast({
+        title: "Upload Failed",
+        description: "Failed to analyze the comic. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -49,6 +58,10 @@ export const UploadButton = () => {
         accept="image/*"
         className="hidden"
         onChange={handleFileChange}
+        onClick={(e) => {
+          // Reset the input value to allow uploading the same file again
+          (e.target as HTMLInputElement).value = '';
+        }}
       />
 
       {analysisResult && (

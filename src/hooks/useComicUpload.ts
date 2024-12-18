@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { analyzeComicImage, saveComicAnalysis } from "@/services/comicAnalysisService";
 import { ComicAnalysisResult } from "@/components/ComicAnalysisResult";
