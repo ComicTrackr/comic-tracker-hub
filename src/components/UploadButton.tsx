@@ -3,40 +3,12 @@ import { Button } from "@/components/ui/button";
 import { useComicCollection } from "@/hooks/useComicCollection";
 import { ComicAnalysisResult } from "@/components/ComicAnalysisResult";
 import { useComicUpload } from "@/hooks/useComicUpload";
-import { useToast } from "@/hooks/use-toast";
 
 export const UploadButton = () => {
   const { analysisResult, setAnalysisResult, addToCollection } = useComicCollection();
-  const { isAnalyzing, handleFileUpload } = useComicUpload();
-  const { toast } = useToast();
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > 10 * 1024 * 1024) { // 10MB limit
-      toast({
-        title: "File too large",
-        description: "Please upload an image smaller than 10MB",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const result = await handleFileUpload(file);
-      if (result) {
-        setAnalysisResult(result);
-      }
-    } catch (error) {
-      console.error('Upload error:', error);
-      toast({
-        title: "Upload Failed",
-        description: "Failed to analyze the comic. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
+  const { isAnalyzing, uploadAndAnalyzeComic } = useComicUpload({
+    onSuccess: (result) => setAnalysisResult(result),
+  });
 
   const handleNewSearch = () => {
     setAnalysisResult(null);
@@ -57,10 +29,12 @@ export const UploadButton = () => {
         type="file"
         accept="image/*"
         className="hidden"
-        onChange={handleFileChange}
-        onClick={(e) => {
-          // Reset the input value to allow uploading the same file again
-          (e.target as HTMLInputElement).value = '';
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            uploadAndAnalyzeComic(file);
+          }
+          e.target.value = ''; // Reset input
         }}
       />
 

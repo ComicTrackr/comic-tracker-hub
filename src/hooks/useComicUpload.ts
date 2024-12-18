@@ -4,52 +4,69 @@ import { supabase } from "@/integrations/supabase/client";
 import { analyzeComicImage, saveComicAnalysis } from "@/services/comicAnalysisService";
 import { ComicAnalysisResult } from "@/components/ComicAnalysisResult";
 
-const compressImage = async (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target?.result as string;
-      
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 800;
-        const MAX_HEIGHT = 800;
-        let width = img.width;
-        let height = img.height;
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
-        if (width > height) {
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
-            width = MAX_WIDTH;
-          }
-        } else {
-          if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height;
-            height = MAX_HEIGHT;
-          }
-        }
+interface UseComicUploadProps {
+  onSuccess?: (result: ComicAnalysisResult) => void;
+}
 
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx?.drawImage(img, 0, 0, width, height);
-
-        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
-        resolve(compressedBase64);
-      };
-      img.onerror = reject;
-    };
-    reader.onerror = reject;
-  });
-};
-
-export const useComicUpload = () => {
+export const useComicUpload = ({ onSuccess }: UseComicUploadProps = {}) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { toast } = useToast();
 
-  const handleFileUpload = async (file: File): Promise<ComicAnalysisResult | null> => {
+  const compressImage = async (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 800;
+          const MAX_HEIGHT = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+
+          resolve(canvas.toDataURL('image/jpeg', 0.8));
+        };
+        
+        img.onerror = reject;
+      };
+      
+      reader.onerror = reject;
+    });
+  };
+
+  const uploadAndAnalyzeComic = async (file: File) => {
+    if (file.size > MAX_FILE_SIZE) {
+      toast({
+        title: "File too large",
+        description: "Please upload an image smaller than 10MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setIsAnalyzing(true);
       
@@ -60,7 +77,7 @@ export const useComicUpload = () => {
           description: "Please log in to analyze comics",
           variant: "destructive",
         });
-        return null;
+        return;
       }
 
       const compressedBase64 = await compressImage(file);
@@ -83,7 +100,7 @@ export const useComicUpload = () => {
         description: "Your comic has been analyzed successfully!",
       });
 
-      return analysis;
+      onSuccess?.(analysis);
 
     } catch (error: any) {
       console.error('Error:', error);
@@ -92,7 +109,6 @@ export const useComicUpload = () => {
         description: error.message || "Failed to analyze the comic",
         variant: "destructive",
       });
-      return null;
     } finally {
       setIsAnalyzing(false);
     }
@@ -100,6 +116,6 @@ export const useComicUpload = () => {
 
   return {
     isAnalyzing,
-    handleFileUpload
+    uploadAndAnalyzeComic
   };
 };
