@@ -12,6 +12,11 @@ const Index = () => {
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="flex flex-col items-center space-y-6">
             <UploadButton />
+            
+            {/* New guidance message */}
+            <p className="text-sm text-muted-foreground text-center max-w-xl mx-auto">
+              Make Sure Your Photos Show The Complete Cover With Issue Number And Title Clearly Visible
+            </p>
           </div>
           
           <div className="text-center">
