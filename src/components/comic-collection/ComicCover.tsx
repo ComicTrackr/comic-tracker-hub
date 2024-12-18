@@ -6,16 +6,22 @@ interface ComicCoverProps {
 }
 
 export const ComicCover = ({ imageUrl, title }: ComicCoverProps) => {
+  // Default placeholder image from Unsplash
+  const fallbackImageUrl = "https://images.unsplash.com/photo-1649972904349-6e44c42644a7";
+
   return (
     <Avatar className="h-12 w-12">
-      {imageUrl ? (
+      {imageUrl || fallbackImageUrl ? (
         <AvatarImage 
-          src={imageUrl} 
+          src={imageUrl || fallbackImageUrl}
           alt={title}
           className="object-cover"
           onError={(e) => {
-            console.error('Image load error:', e);
-            e.currentTarget.src = '/placeholder.svg';
+            console.error('Image load error for:', title);
+            // If the main image fails, try the fallback
+            if (imageUrl && e.currentTarget.src !== fallbackImageUrl) {
+              e.currentTarget.src = fallbackImageUrl;
+            }
           }}
         />
       ) : (
