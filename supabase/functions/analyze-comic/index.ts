@@ -23,15 +23,21 @@ serve(async (req) => {
     let prompt, result
 
     if (image) {
-      prompt = `You are a comic book expert and market analyst. For this comic cover image, provide:
+      prompt = `You are a comic book expert and market analyst with access to current market data. For this comic cover image, provide:
       1. The exact title and issue number
-      2. Recent market value data for both graded (CGC 9.8) and ungraded Near Mint copies in USD
+      2. Current market value data based on recent eBay sales and market trends:
+         - For CGC 9.8 copies: Use actual recent sales data, focusing on the last 3-6 months
+         - For ungraded Near Mint copies: Use actual raw copy sales data from the last 3-6 months
       3. Key issue information or significant details about this specific issue
+      
+      Be conservative with valuations and base them strictly on verifiable recent sales data.
+      If this is a modern comic (published in the last 5 years), be especially careful not to overvalue it.
+      
       Format your response exactly like this:
       Title: [Comic Title and Issue Number]
-      GradedValue: [USD amount for CGC 9.8]
-      UngradedValue: [USD amount for raw Near Mint]
-      Analysis: [Key issue status, significant events, or notable features of this specific issue]`
+      GradedValue: [USD amount for CGC 9.8 based on recent sales]
+      UngradedValue: [USD amount for raw Near Mint based on recent sales]
+      Analysis: [Key issue status, significant events, market trends, and price justification based on recent sales data]`
 
       try {
         console.log('Processing image...');
@@ -59,15 +65,21 @@ serve(async (req) => {
         throw new Error('Failed to process image: ' + imageError.message);
       }
     } else if (searchQuery) {
-      prompt = `You are a comic book expert and market analyst. For the comic "${searchQuery}", provide:
+      prompt = `You are a comic book expert and market analyst with access to current market data. For the comic "${searchQuery}", provide:
       1. The exact title and issue number
-      2. Recent market value data for both graded (CGC 9.8) and ungraded Near Mint copies in USD
+      2. Current market value data based on recent eBay sales and market trends:
+         - For CGC 9.8 copies: Use actual recent sales data, focusing on the last 3-6 months
+         - For ungraded Near Mint copies: Use actual raw copy sales data from the last 3-6 months
       3. Key issue information or significant details about this specific issue
+      
+      Be conservative with valuations and base them strictly on verifiable recent sales data.
+      If this is a modern comic (published in the last 5 years), be especially careful not to overvalue it.
+      
       Format your response exactly like this:
       Title: [Comic Title and Issue Number]
-      GradedValue: [USD amount for CGC 9.8]
-      UngradedValue: [USD amount for raw Near Mint]
-      Analysis: [Key issue status, significant events, or notable features of this specific issue]`
+      GradedValue: [USD amount for CGC 9.8 based on recent sales]
+      UngradedValue: [USD amount for raw Near Mint based on recent sales]
+      Analysis: [Key issue status, significant events, market trends, and price justification based on recent sales data]`
 
       result = await model.generateContent(prompt)
     } else {
