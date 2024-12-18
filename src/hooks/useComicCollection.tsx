@@ -7,7 +7,34 @@ export const useComicCollection = () => {
   const { toast } = useToast();
   const [analysisResult, setAnalysisResult] = useState<ComicAnalysisResult | null>(null);
 
-  const addToCollection = async (isGraded: boolean, grade: string, adjustedValue: number) => {
+  const uploadCoverImage = async (file: File) => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${crypto.randomUUID()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('comic-covers')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('comic-covers')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({
+        title: "Error",
+        description: "Failed to upload cover image",
+        variant: "destructive",
+      });
+      return null;
+    }
+  };
+
+  const addToCollection = async (isGraded: boolean, grade: string, adjustedValue: number, coverImage?: File) => {
     if (!analysisResult) return;
 
     try {
@@ -21,6 +48,11 @@ export const useComicCollection = () => {
         return;
       }
 
+      let imageUrl = null;
+      if (coverImage) {
+        imageUrl = await uploadCoverImage(coverImage);
+      }
+
       const { error } = await supabase
         .from('user_comics')
         .insert({
@@ -28,7 +60,8 @@ export const useComicCollection = () => {
           comic_title: analysisResult.comic_title,
           estimated_value: adjustedValue,
           condition_rating: grade,
-          is_graded: isGraded
+          is_graded: isGraded,
+          image_url: imageUrl
         });
 
       if (error) throw error;
