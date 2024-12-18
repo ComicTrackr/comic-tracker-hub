@@ -6,7 +6,7 @@ export const Navbar = () => {
   return (
     <nav className="fixed top-0 w-full bg-background border-b border-border z-50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="text-xl font-bold">ComicAI</div>
+        <div className="text-xl font-bold">ComicTrackr</div>
         
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-6">
