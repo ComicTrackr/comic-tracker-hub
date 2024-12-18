@@ -7,11 +7,15 @@ import { useComicUpload } from "@/hooks/useComicUpload";
 export const UploadButton = () => {
   const { analysisResult, setAnalysisResult, addToCollection } = useComicCollection();
   const { isAnalyzing, uploadAndAnalyzeComic } = useComicUpload({
-    onSuccess: (result) => setAnalysisResult(result),
+    onSuccess: setAnalysisResult,
   });
 
-  const handleNewSearch = () => {
-    setAnalysisResult(null);
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      uploadAndAnalyzeComic(file);
+    }
+    event.target.value = ''; // Reset input
   };
 
   return (
@@ -29,20 +33,14 @@ export const UploadButton = () => {
         type="file"
         accept="image/*"
         className="hidden"
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) {
-            uploadAndAnalyzeComic(file);
-          }
-          e.target.value = ''; // Reset input
-        }}
+        onChange={handleFileChange}
       />
 
       {analysisResult && (
         <ComicAnalysisResult 
           result={analysisResult}
           onAddToCollection={addToCollection}
-          onNewSearch={handleNewSearch}
+          onNewSearch={() => setAnalysisResult(null)}
         />
       )}
     </div>

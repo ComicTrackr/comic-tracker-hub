@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { analyzeComicImage, saveComicAnalysis } from "@/services/comicAnalysisService";
+import { compressImage } from "@/utils/imageCompression";
 import { ComicAnalysisResult } from "@/components/ComicAnalysisResult";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -14,72 +15,41 @@ export const useComicUpload = ({ onSuccess }: UseComicUploadProps = {}) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { toast } = useToast();
 
-  const compressImage = async (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target?.result as string;
-        
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 800;
-          const MAX_HEIGHT = 800;
-          let width = img.width;
-          let height = img.height;
-
-          if (width > height) {
-            if (width > MAX_WIDTH) {
-              height *= MAX_WIDTH / width;
-              width = MAX_WIDTH;
-            }
-          } else {
-            if (height > MAX_HEIGHT) {
-              width *= MAX_HEIGHT / height;
-              height = MAX_HEIGHT;
-            }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx?.drawImage(img, 0, 0, width, height);
-
-          resolve(canvas.toDataURL('image/jpeg', 0.8));
-        };
-        
-        img.onerror = reject;
-      };
-      
-      reader.onerror = reject;
-    });
-  };
-
-  const uploadAndAnalyzeComic = async (file: File) => {
+  const validateFile = (file: File): boolean => {
     if (file.size > MAX_FILE_SIZE) {
       toast({
         title: "File too large",
         description: "Please upload an image smaller than 10MB",
         variant: "destructive",
       });
-      return;
+      return false;
     }
+    return true;
+  };
+
+  const validateAuth = async (): Promise<boolean> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to analyze comics",
+        variant: "destructive",
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const uploadAndAnalyzeComic = async (file: File) => {
+    if (!validateFile(file)) return;
 
     try {
       setIsAnalyzing(true);
       
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          title: "Authentication required",
-          description: "Please log in to analyze comics",
-          variant: "destructive",
-        });
-        return;
-      }
+      const isAuthenticated = await validateAuth();
+      if (!isAuthenticated) return;
 
+      const { data: { user } } = await supabase.auth.getUser();
       const compressedBase64 = await compressImage(file);
 
       toast({
@@ -93,7 +63,7 @@ export const useComicUpload = ({ onSuccess }: UseComicUploadProps = {}) => {
         throw new Error("Failed to analyze the comic");
       }
 
-      await saveComicAnalysis(user.id, analysis, compressedBase64);
+      await saveComicAnalysis(user!.id, analysis, compressedBase64);
 
       toast({
         title: "Analysis Complete",
