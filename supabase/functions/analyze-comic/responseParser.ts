@@ -16,11 +16,17 @@ export const parseGeminiResponse = (text: string, coverImageUrl: string | null):
   const recentUngradedSalesMatch = text.match(/RecentUngradedSales:\s*(.+?)(?=\n(?:[A-Za-z]+:|$))/is);
   const analysisMatch = text.match(/Analysis:\s*(.+?)(?=\n|$)/is);
 
+  // Validate the cover image URL
   const validImageUrl = coverImageUrl && (
-    coverImageUrl.endsWith('.jpg') || 
-    coverImageUrl.endsWith('.jpeg') || 
-    coverImageUrl.endsWith('.png')
+    coverImageUrl.startsWith('http') && (
+      coverImageUrl.endsWith('.jpg') || 
+      coverImageUrl.endsWith('.jpeg') || 
+      coverImageUrl.endsWith('.png') ||
+      coverImageUrl.endsWith('.webp')
+    )
   ) ? coverImageUrl : null;
+
+  console.log('Cover image URL:', validImageUrl); // Debug log
 
   const gradedValue = gradedValueMatch ? 
     parseFloat(gradedValueMatch[1].replace(/,/g, '')) : 

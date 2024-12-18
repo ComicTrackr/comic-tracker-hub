@@ -37,6 +37,8 @@ export const SearchBar = () => {
 
       if (error) throw error;
 
+      console.log('Analysis response:', analysis); // Debug log
+
       setAnalysisResult({
         comic_title: analysis.comic_title,
         analysis_text: analysis.analysis_text,

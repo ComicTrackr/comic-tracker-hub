@@ -6,8 +6,12 @@ interface ComicCoverProps {
 }
 
 export const ComicCover = ({ imageUrl, title }: ComicCoverProps) => {
-  // Default placeholder image from Unsplash
   const fallbackImageUrl = "/placeholder.svg";
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    console.error('Image load error for:', title, 'URL:', imageUrl);
+    e.currentTarget.src = fallbackImageUrl;
+  };
 
   return (
     <Avatar className="h-12 w-12">
@@ -16,10 +20,7 @@ export const ComicCover = ({ imageUrl, title }: ComicCoverProps) => {
           src={imageUrl}
           alt={title}
           className="object-cover"
-          onError={(e) => {
-            console.error('Image load error for:', title);
-            e.currentTarget.src = fallbackImageUrl;
-          }}
+          onError={handleImageError}
         />
       ) : (
         <AvatarFallback>
