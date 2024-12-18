@@ -15,18 +15,22 @@ export const parseGeminiResponse = (text: string, coverImageUrl: string | null):
   const recentGradedSalesMatch = text.match(/RecentGradedSales:\s*(.+?)(?=\n(?:[A-Za-z]+:|$))/is);
   const recentUngradedSalesMatch = text.match(/RecentUngradedSales:\s*(.+?)(?=\n(?:[A-Za-z]+:|$))/is);
   const analysisMatch = text.match(/Analysis:\s*(.+?)(?=\n|$)/is);
+  const coverImageMatch = text.match(/CoverImage:\s*(.+?)(?=\n|$)/i);
 
-  // Validate the cover image URL
-  const validImageUrl = coverImageUrl && (
-    coverImageUrl.startsWith('http') && (
-      coverImageUrl.endsWith('.jpg') || 
-      coverImageUrl.endsWith('.jpeg') || 
-      coverImageUrl.endsWith('.png') ||
-      coverImageUrl.endsWith('.webp')
+  // Validate any found cover image URL
+  const extractedCoverUrl = coverImageMatch ? coverImageMatch[1].trim() : null;
+  const validImageUrl = extractedCoverUrl && (
+    extractedCoverUrl.startsWith('http') && (
+      extractedCoverUrl.endsWith('.jpg') || 
+      extractedCoverUrl.endsWith('.jpeg') || 
+      extractedCoverUrl.endsWith('.png') ||
+      extractedCoverUrl.endsWith('.webp')
     )
-  ) ? coverImageUrl : null;
+  ) ? extractedCoverUrl : coverImageUrl;
 
-  console.log('Cover image URL:', validImageUrl); // Debug log
+  console.log('Extracted cover URL:', extractedCoverUrl);
+  console.log('Provided cover URL:', coverImageUrl);
+  console.log('Final valid URL:', validImageUrl);
 
   const gradedValue = gradedValueMatch ? 
     parseFloat(gradedValueMatch[1].replace(/,/g, '')) : 
