@@ -15,7 +15,14 @@ export const Navbar = () => {
   return (
     <nav className="fixed top-0 w-full bg-background border-b border-border z-50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="text-xl font-bold">ComicTrackr</div>
+        <div className="flex items-center gap-2">
+          <img 
+            src="/lovable-uploads/19d22c42-8007-4f8d-95f9-642b4061b6f7.png" 
+            alt="ComicTrackr Logo" 
+            className="h-12 w-12"
+          />
+          <span className="text-xl font-bold">ComicTrackr</span>
+        </div>
         
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-6">
