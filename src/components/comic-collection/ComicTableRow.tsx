@@ -20,27 +20,27 @@ interface ComicTableRowProps {
 export const ComicTableRow = ({ comic, onDelete }: ComicTableRowProps) => {
   return (
     <TableRow key={comic.id}>
-      <TableCell className="font-medium break-words px-2 md:px-4 text-sm md:text-base">
+      <TableCell className="font-medium px-4">
         {comic.comic_title}
       </TableCell>
-      <TableCell className="whitespace-normal px-2 md:px-4 text-sm md:text-base">
+      <TableCell className="px-4">
         {comic.condition_rating || 'N/A'}
       </TableCell>
-      <TableCell className="px-2 md:px-4 text-sm md:text-base">
+      <TableCell className="px-4">
         {comic.estimated_value 
           ? `$${comic.estimated_value.toLocaleString()}`
           : 'N/A'
         }
       </TableCell>
-      <TableCell className="whitespace-nowrap px-2 md:px-4 text-sm md:text-base">
+      <TableCell className="px-4">
         {new Date(comic.added_at).toLocaleDateString()}
       </TableCell>
-      <TableCell className="px-2 md:px-4 text-sm md:text-base">
+      <TableCell className="px-4">
         <Badge variant={comic.is_graded ? "default" : "secondary"}>
           {comic.is_graded ? "Graded" : "Raw"}
         </Badge>
       </TableCell>
-      <TableCell className="px-2 md:px-4">
+      <TableCell className="px-4">
         <DeleteComicButton 
           comicId={comic.id}
           onDelete={onDelete}

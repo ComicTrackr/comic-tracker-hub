@@ -43,22 +43,20 @@ export const ComicCollection = () => {
   }, []);
 
   return (
-    <div className="w-full overflow-x-auto -mx-4 sm:mx-0">
-      <div className="min-w-full inline-block align-middle">
-        <div className="overflow-hidden">
-          <Table>
-            <ComicTableHeader />
-            <TableBody>
-              {comics.map((comic) => (
-                <ComicTableRow 
-                  key={comic.id}
-                  comic={comic}
-                  onDelete={fetchComics}
-                />
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+    <div className="w-full">
+      <div className="rounded-md border">
+        <Table>
+          <ComicTableHeader />
+          <TableBody>
+            {comics.map((comic) => (
+              <ComicTableRow 
+                key={comic.id}
+                comic={comic}
+                onDelete={fetchComics}
+              />
+            ))}
+          </TableBody>
+        </Table>
       </div>
     </div>
   );
