@@ -10,6 +10,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { DeleteComicButton } from "./DeleteComicButton";
 import { useRealtimeSubscription } from "@/utils/useRealtimeSubscription";
+import { Badge } from "@/components/ui/badge";
 
 interface Comic {
   id: string;
@@ -17,6 +18,7 @@ interface Comic {
   condition_rating: string | null;
   estimated_value: number | null;
   added_at: string;
+  is_graded: boolean;
 }
 
 export const ComicCollection = () => {
@@ -53,6 +55,7 @@ export const ComicCollection = () => {
                 <TableHead className="text-orange-800 min-w-[100px] px-2 md:px-4">Condition</TableHead>
                 <TableHead className="text-orange-800 min-w-[80px] px-2 md:px-4">Value</TableHead>
                 <TableHead className="text-orange-800 min-w-[90px] px-2 md:px-4">Added</TableHead>
+                <TableHead className="text-orange-800 min-w-[80px] px-2 md:px-4">Status</TableHead>
                 <TableHead className="text-orange-800 w-[50px] px-2 md:px-4">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -73,6 +76,11 @@ export const ComicCollection = () => {
                   </TableCell>
                   <TableCell className="whitespace-nowrap px-2 md:px-4 text-sm md:text-base">
                     {new Date(comic.added_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell className="px-2 md:px-4 text-sm md:text-base">
+                    <Badge variant={comic.is_graded ? "default" : "secondary"}>
+                      {comic.is_graded ? "Graded" : "Raw"}
+                    </Badge>
                   </TableCell>
                   <TableCell className="px-2 md:px-4">
                     <DeleteComicButton 

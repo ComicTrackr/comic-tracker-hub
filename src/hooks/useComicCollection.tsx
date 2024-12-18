@@ -27,7 +27,8 @@ export const useComicCollection = () => {
           user_id: user.id,
           comic_title: analysisResult.comic_title,
           estimated_value: adjustedValue,
-          condition_rating: grade
+          condition_rating: grade,
+          is_graded: isGraded
         });
 
       if (error) throw error;
