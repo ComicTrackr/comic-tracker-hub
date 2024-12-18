@@ -1,15 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Search } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Search } from "lucide-react";
 import { useState } from "react";
+import { SalesInfo } from "./comic-analysis/SalesInfo";
+import { ConditionSelector } from "./comic-analysis/ConditionSelector";
 
 export interface ComicAnalysisResult {
   comic_title: string;
@@ -81,20 +74,10 @@ export const ComicAnalysisResult = ({ result, onAddToCollection, onNewSearch }: 
             </div>
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <h4 className="font-medium text-sm">Recent Graded Sales Range</h4>
-              <p className="text-sm whitespace-pre-line text-muted-foreground">
-                {result.recent_graded_sales}
-              </p>
-            </div>
-            <div className="space-y-2">
-              <h4 className="font-medium text-sm">Recent Ungraded Sales Range</h4>
-              <p className="text-sm whitespace-pre-line text-muted-foreground">
-                {result.recent_ungraded_sales}
-              </p>
-            </div>
-          </div>
+          <SalesInfo 
+            recentGradedSales={result.recent_graded_sales}
+            recentUngradedSales={result.recent_ungraded_sales}
+          />
         </div>
 
         <div className="flex flex-col gap-2">
@@ -107,56 +90,20 @@ export const ComicAnalysisResult = ({ result, onAddToCollection, onNewSearch }: 
             New Search
           </Button>
           <div className="space-y-2">
-            <div className="space-y-1">
-              <Select
-                value={selectedGradedCondition}
-                onValueChange={setSelectedGradedCondition}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select grade" />
-                </SelectTrigger>
-                <SelectContent>
-                  {GRADED_CONDITIONS.map((condition) => (
-                    <SelectItem key={condition} value={condition}>
-                      {condition}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button
-                onClick={() => onAddToCollection(true, selectedGradedCondition)}
-                variant="outline"
-                className="w-full flex items-center gap-2"
-              >
-                <PlusCircle className="h-4 w-4" />
-                Add Graded Copy
-              </Button>
-            </div>
-            <div className="space-y-1">
-              <Select
-                value={selectedUngradedCondition}
-                onValueChange={setSelectedUngradedCondition}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select condition" />
-                </SelectTrigger>
-                <SelectContent>
-                  {UNGRADED_CONDITIONS.map((condition) => (
-                    <SelectItem key={condition} value={condition}>
-                      {condition}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button
-                onClick={() => onAddToCollection(false, selectedUngradedCondition)}
-                variant="outline"
-                className="w-full flex items-center gap-2"
-              >
-                <PlusCircle className="h-4 w-4" />
-                Add Ungraded Copy
-              </Button>
-            </div>
+            <ConditionSelector
+              conditions={GRADED_CONDITIONS}
+              selectedCondition={selectedGradedCondition}
+              onConditionChange={setSelectedGradedCondition}
+              onAddToCollection={() => onAddToCollection(true, selectedGradedCondition)}
+              label="Add Graded Copy"
+            />
+            <ConditionSelector
+              conditions={UNGRADED_CONDITIONS}
+              selectedCondition={selectedUngradedCondition}
+              onConditionChange={setSelectedUngradedCondition}
+              onAddToCollection={() => onAddToCollection(false, selectedUngradedCondition)}
+              label="Add Ungraded Copy"
+            />
           </div>
         </div>
       </div>
