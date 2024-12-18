@@ -2,13 +2,7 @@ import { useState } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { analyzeComicImage, saveComicAnalysis } from "@/services/comicAnalysisService";
-
-export interface ComicAnalysisResult {
-  comic_title: string;
-  analysis_text: string;
-  condition_rating: string;
-  estimated_value: number;
-}
+import { ComicAnalysisResult } from "@/components/ComicAnalysisResult";
 
 const compressImage = async (file: File): Promise<string> => {
   console.log('Original file size:', Math.round(file.size / 1024), 'KB');
@@ -23,8 +17,8 @@ const compressImage = async (file: File): Promise<string> => {
       
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 600; // Reduced from 800
-        const MAX_HEIGHT = 600; // Reduced from 800
+        const MAX_WIDTH = 600;
+        const MAX_HEIGHT = 600;
         let width = img.width;
         let height = img.height;
 
@@ -45,7 +39,6 @@ const compressImage = async (file: File): Promise<string> => {
         const ctx = canvas.getContext('2d');
         ctx?.drawImage(img, 0, 0, width, height);
 
-        // Convert to JPEG with 0.6 quality (reduced from 0.8)
         const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
         console.log('Base64 size after compression:', Math.round(compressedBase64.length / 1024), 'KB');
         resolve(compressedBase64);
@@ -64,10 +57,8 @@ export const useComicUpload = () => {
     try {
       setIsAnalyzing(true);
       
-      // Compress the image before sending
       const compressedBase64 = await compressImage(file);
 
-      // Check authentication
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast({
@@ -83,10 +74,8 @@ export const useComicUpload = () => {
         description: "Please wait while we analyze your comic cover",
       });
 
-      // Analyze the comic with compressed image
       const analysis = await analyzeComicImage(compressedBase64);
       
-      // Save the analysis
       await saveComicAnalysis(user.id, analysis, compressedBase64);
 
       toast({

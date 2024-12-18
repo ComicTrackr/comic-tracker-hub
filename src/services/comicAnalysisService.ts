@@ -20,9 +20,8 @@ export const saveComicAnalysis = async (
     .insert({
       user_id: userId,
       comic_title: analysis.comic_title,
-      analysis_text: analysis.analysis_text, // Changed from analysis.text to analysis.analysis_text
-      condition_rating: analysis.condition_rating,
-      estimated_value: analysis.estimated_value,
+      analysis_text: analysis.analysis_text,
+      estimated_value: analysis.graded_value,
       image_url: imageUrl
     });
 

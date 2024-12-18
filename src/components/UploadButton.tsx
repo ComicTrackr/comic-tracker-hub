@@ -45,7 +45,7 @@ export const UploadButton = () => {
       {analysisResult && (
         <ComicAnalysisResult 
           result={analysisResult}
-          onAddToCollection={() => addToCollection(analysisResult)}
+          onAddToCollection={addToCollection}
           onNewSearch={handleNewSearch}
         />
       )}
