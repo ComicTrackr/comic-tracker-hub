@@ -19,6 +19,7 @@ export const useComicCollection = () => {
         return;
       }
 
+      // Save the analysis results to user_comics table
       const { error } = await supabase
         .from('user_comics')
         .insert({
