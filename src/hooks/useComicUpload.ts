@@ -5,20 +5,17 @@ import { analyzeComicImage, saveComicAnalysis } from "@/services/comicAnalysisSe
 import { ComicAnalysisResult } from "@/components/ComicAnalysisResult";
 
 const compressImage = async (file: File): Promise<string> => {
-  console.log('Original file size:', Math.round(file.size / 1024), 'KB');
-  
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = (event) => {
       const img = new Image();
       img.src = event.target?.result as string;
-      console.log('Base64 size before compression:', Math.round((event.target?.result as string).length / 1024), 'KB');
       
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 600;
-        const MAX_HEIGHT = 600;
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
         let width = img.width;
         let height = img.height;
 
@@ -39,8 +36,7 @@ const compressImage = async (file: File): Promise<string> => {
         const ctx = canvas.getContext('2d');
         ctx?.drawImage(img, 0, 0, width, height);
 
-        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
-        console.log('Base64 size after compression:', Math.round(compressedBase64.length / 1024), 'KB');
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
         resolve(compressedBase64);
       };
       img.onerror = reject;
@@ -57,8 +53,6 @@ export const useComicUpload = () => {
     try {
       setIsAnalyzing(true);
       
-      const compressedBase64 = await compressImage(file);
-
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast({
@@ -69,6 +63,8 @@ export const useComicUpload = () => {
         return null;
       }
 
+      const compressedBase64 = await compressImage(file);
+
       toast({
         title: "Analyzing...",
         description: "Please wait while we analyze your comic cover",
@@ -76,6 +72,10 @@ export const useComicUpload = () => {
 
       const analysis = await analyzeComicImage(compressedBase64);
       
+      if (!analysis) {
+        throw new Error("Failed to analyze the comic");
+      }
+
       await saveComicAnalysis(user.id, analysis, compressedBase64);
 
       toast({
