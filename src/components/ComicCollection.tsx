@@ -37,6 +37,7 @@ export const ComicCollection = () => {
       return;
     }
 
+    console.log('Fetched comics:', userComics); // Debug log
     setComics(userComics);
   };
 
@@ -67,14 +68,21 @@ export const ComicCollection = () => {
                 <TableRow key={comic.id}>
                   <TableCell className="px-2 md:px-4">
                     <Avatar className="h-12 w-12">
-                      <AvatarImage 
-                        src={comic.image_url || '/placeholder.svg'} 
-                        alt={comic.comic_title}
-                        className="object-cover"
-                      />
-                      <AvatarFallback>
-                        {comic.comic_title.substring(0, 2).toUpperCase()}
-                      </AvatarFallback>
+                      {comic.image_url ? (
+                        <AvatarImage 
+                          src={comic.image_url} 
+                          alt={comic.comic_title}
+                          className="object-cover"
+                          onError={(e) => {
+                            console.error('Image load error:', e);
+                            e.currentTarget.src = '/placeholder.svg';
+                          }}
+                        />
+                      ) : (
+                        <AvatarFallback>
+                          {comic.comic_title.substring(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      )}
                     </Avatar>
                   </TableCell>
                   <TableCell className="font-medium break-words px-2 md:px-4 text-sm md:text-base">
