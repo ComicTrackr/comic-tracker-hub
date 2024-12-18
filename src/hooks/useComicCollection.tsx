@@ -21,11 +21,13 @@ export const useComicCollection = () => {
         return;
       }
 
-      console.log('Adding comic with following details:');
-      console.log('Title:', analysisResult.comic_title);
-      console.log('Image URL:', analysisResult.cover_image_url);
-      console.log('Grade:', grade);
-      console.log('Value:', adjustedValue);
+      const imageUrl = analysisResult.cover_image_url || null;
+      console.log('Adding comic to collection:', {
+        title: analysisResult.comic_title,
+        imageUrl,
+        grade,
+        value: adjustedValue
+      });
 
       const { error } = await supabase
         .from('user_comics')
@@ -35,7 +37,7 @@ export const useComicCollection = () => {
           estimated_value: adjustedValue,
           condition_rating: grade,
           is_graded: isGraded,
-          image_url: analysisResult.cover_image_url || null
+          image_url: imageUrl
         });
 
       if (error) throw error;

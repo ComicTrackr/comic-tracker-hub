@@ -9,25 +9,21 @@ interface ComicCoverProps {
 export const ComicCover = ({ imageUrl, title }: ComicCoverProps) => {
   const [imageError, setImageError] = useState(false);
   const [displayUrl, setDisplayUrl] = useState<string>("/placeholder.svg");
-  const fallbackImageUrl = "/placeholder.svg";
 
   useEffect(() => {
-    console.log('ComicCover received imageUrl:', imageUrl);
-    if (imageUrl) {
+    if (imageUrl && !imageError) {
+      console.log('Setting image URL:', imageUrl);
       setDisplayUrl(imageUrl);
-      setImageError(false);
     } else {
-      console.log('No image URL provided, using fallback');
-      setDisplayUrl(fallbackImageUrl);
+      console.log('Using fallback for:', title);
+      setDisplayUrl("/placeholder.svg");
     }
-  }, [imageUrl]);
+  }, [imageUrl, imageError, title]);
 
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.error('Image load error for:', title);
-    console.error('Failed URL:', imageUrl);
-    console.error('Error event:', e);
+  const handleImageError = () => {
+    console.error('Failed to load image:', imageUrl);
     setImageError(true);
-    setDisplayUrl(fallbackImageUrl);
+    setDisplayUrl("/placeholder.svg");
   };
 
   return (
