@@ -6,41 +6,21 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-async function resizeImage(base64Image: string): Promise<Uint8Array> {
-  // Create an image element
-  const img = new Image()
-  img.src = base64Image
+function processBase64Image(base64Image: string): Uint8Array {
+  // Remove data URL prefix if present
+  const base64Data = base64Image.includes(',') ? 
+    base64Image.split(',')[1] : 
+    base64Image;
+
+  // Convert base64 to binary
+  const binaryStr = atob(base64Data);
+  const bytes = new Uint8Array(binaryStr.length);
   
-  await new Promise((resolve) => {
-    img.onload = resolve
-  })
-
-  // Create a canvas and get its context
-  const canvas = new OffscreenCanvas(800, 800)
-  const ctx = canvas.getContext('2d')
-
-  // Calculate new dimensions maintaining aspect ratio
-  let width = img.width
-  let height = img.height
-  const maxDimension = 800
-
-  if (width > height && width > maxDimension) {
-    height = (height * maxDimension) / width
-    width = maxDimension
-  } else if (height > maxDimension) {
-    width = (width * maxDimension) / height
-    height = maxDimension
+  for (let i = 0; i < binaryStr.length; i++) {
+    bytes[i] = binaryStr.charCodeAt(i);
   }
-
-  // Set canvas dimensions and draw resized image
-  canvas.width = width
-  canvas.height = height
-  ctx.drawImage(img, 0, 0, width, height)
-
-  // Convert to blob and then to Uint8Array
-  const blob = await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.8 })
-  const arrayBuffer = await blob.arrayBuffer()
-  return new Uint8Array(arrayBuffer)
+  
+  return bytes;
 }
 
 serve(async (req) => {
@@ -70,22 +50,23 @@ serve(async (req) => {
       Analysis: [Your detailed analysis]`
 
       try {
-        // Resize the image before processing
-        const resizedImageData = await resizeImage(image)
-        console.log('Image resized successfully, size:', resizedImageData.length)
+        console.log('Processing image...');
+        const imageData = processBase64Image(image);
+        console.log('Image processed, size:', imageData.length);
 
         result = await model.generateContent([
           prompt,
           {
             inlineData: {
               mimeType: "image/jpeg",
-              data: resizedImageData
+              data: imageData
             }
           }
-        ])
+        ]);
+        console.log('Analysis completed successfully');
       } catch (imageError) {
-        console.error('Error processing image:', imageError)
-        throw new Error('Failed to process image: ' + imageError.message)
+        console.error('Error processing image:', imageError);
+        throw new Error('Failed to process image: ' + imageError.message);
       }
     } else if (searchQuery) {
       // Text-based search
