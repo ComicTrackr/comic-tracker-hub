@@ -12,28 +12,44 @@ const Login = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Check if user is already logged in
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate("/dashboard");
+      }
+    });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN') {
         try {
           const { data, error } = await supabase.functions.invoke('create-checkout');
           
-          if (error) throw error;
+          if (error) {
+            console.error('Checkout error:', error);
+            toast({
+              title: "Error",
+              description: "Failed to initiate payment. Please try again.",
+              variant: "destructive",
+            });
+            navigate("/dashboard");
+            return;
+          }
           
           if (data?.url) {
             window.location.href = data.url;
           } else {
-            throw new Error('No checkout URL received');
+            navigate("/dashboard");
           }
         } catch (error) {
           console.error('Payment error:', error);
           toast({
             title: "Error",
-            description: "Failed to initiate payment. Please try again.",
+            description: "Failed to process payment. Redirecting to dashboard.",
             variant: "destructive",
           });
           navigate("/dashboard");
         }
-      } else if (session) {
+      } else if (event === 'USER_UPDATED' || (event === 'SIGNED_IN' && session)) {
         navigate("/dashboard");
       }
     });
@@ -56,12 +72,13 @@ const Login = () => {
                   colors: {
                     brand: '#c45a1c',
                     brandAccent: '#b54a0c',
-                    inputText: '#FFFFFF',
+                    inputText: 'inherit',
                   }
                 }
               }
             }}
             providers={[]}
+            redirectTo={window.location.origin}
           />
         </Card>
       </div>
