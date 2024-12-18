@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -6,49 +7,83 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { supabase } from "@/integrations/supabase/client";
 
-// Mock data - replace with real data later
-const mockComics = [
-  {
-    id: 1,
-    title: "Amazing Spider-Man",
-    volume: 1,
-    issueNumber: 300,
-    value: 1200.00,
-    lastUpdated: "2024-03-20",
-  },
-  {
-    id: 2,
-    title: "X-Men",
-    volume: 1,
-    issueNumber: 141,
-    value: 450.00,
-    lastUpdated: "2024-03-20",
-  },
-  // Add more mock data as needed
-];
+interface Comic {
+  id: string;
+  comic_title: string;
+  condition_rating: string | null;
+  estimated_value: number | null;
+  added_at: string;
+}
 
 export const ComicCollection = () => {
+  const [comics, setComics] = useState<Comic[]>([]);
+
+  useEffect(() => {
+    // Initial fetch of comics
+    fetchComics();
+
+    // Set up real-time subscription
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_comics'
+        },
+        () => {
+          fetchComics();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const fetchComics = async () => {
+    const { data: userComics, error } = await supabase
+      .from('user_comics')
+      .select('*')
+      .order('added_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching comics:', error);
+      return;
+    }
+
+    setComics(userComics);
+  };
+
   return (
     <div className="overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead className="text-orange-800">Title</TableHead>
-            <TableHead className="text-orange-800">Volume</TableHead>
-            <TableHead className="text-orange-800">Issue #</TableHead>
+            <TableHead className="text-orange-800">Condition</TableHead>
             <TableHead className="text-orange-800">Value</TableHead>
-            <TableHead className="text-orange-800">Last Updated</TableHead>
+            <TableHead className="text-orange-800">Added</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {mockComics.map((comic) => (
+          {comics.map((comic) => (
             <TableRow key={comic.id}>
-              <TableCell className="font-medium">{comic.title}</TableCell>
-              <TableCell>{comic.volume}</TableCell>
-              <TableCell>{comic.issueNumber}</TableCell>
-              <TableCell>${comic.value.toLocaleString()}</TableCell>
-              <TableCell>{new Date(comic.lastUpdated).toLocaleDateString()}</TableCell>
+              <TableCell className="font-medium">{comic.comic_title}</TableCell>
+              <TableCell>{comic.condition_rating || 'N/A'}</TableCell>
+              <TableCell>
+                {comic.estimated_value 
+                  ? `$${comic.estimated_value.toLocaleString()}`
+                  : 'N/A'
+                }
+              </TableCell>
+              <TableCell>
+                {new Date(comic.added_at).toLocaleDateString()}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
