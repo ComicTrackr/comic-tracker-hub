@@ -37,14 +37,14 @@ export const SearchBar = () => {
 
       if (error) throw error;
 
-      // Update to include recent_graded_sales and recent_ungraded_sales
       setAnalysisResult({
         comic_title: analysis.comic_title,
         analysis_text: analysis.analysis_text,
         graded_value: analysis.graded_value,
         ungraded_value: analysis.ungraded_value,
-        recent_graded_sales: analysis.recent_graded_sales || '',  // Provide a default empty string
-        recent_ungraded_sales: analysis.recent_ungraded_sales || ''  // Provide a default empty string
+        recent_graded_sales: analysis.recent_graded_sales || '',
+        recent_ungraded_sales: analysis.recent_ungraded_sales || '',
+        cover_image_url: analysis.cover_image_url || null
       });
 
       toast({

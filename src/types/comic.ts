@@ -5,4 +5,5 @@ export interface ComicAnalysisResult {
   ungraded_value: number;
   recent_graded_sales: string;
   recent_ungraded_sales: string;
+  cover_image_url?: string;
 }

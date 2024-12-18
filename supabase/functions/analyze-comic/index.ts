@@ -20,7 +20,7 @@ serve(async (req) => {
     const genAI = new GoogleGenerativeAI(Deno.env.get('GEMINI_API_KEY'))
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
 
-    let prompt, result
+    let prompt, result, coverImagePrompt, coverImageResult
 
     if (image) {
       prompt = `You are a comic book expert specializing in eBay market analysis. For this comic cover image, provide a detailed analysis focusing EXCLUSIVELY on eBay's recently sold listings from the last 30 days.
@@ -77,17 +77,14 @@ serve(async (req) => {
       UngradedValue: [Numeric value only, e.g. 50]
       RecentGradedSales: Highest: [Grade] $[Price] | Lowest: [Grade] $[Price]
       RecentUngradedSales: Highest: [Condition] $[Price] | Lowest: [Condition] $[Price]
-      Analysis: [2-3 sentences about market trends]
-
-      Guidelines:
-      - For GradedValue: Use average CGC 9.8 price. If no 9.8s, use 9.6 price + 20%
-      - For UngradedValue: Use average NM raw copy price
-      - Only use actual eBay completed sales from last 30 days
-      - Values must be numbers only, no text or symbols
-      - Sales ranges must follow the exact format shown above
-      - If no sales data available, use "No recent sales data" for that category`
+      Analysis: [2-3 sentences about market trends]`
 
       result = await model.generateContent(prompt)
+
+      // Additional prompt to get cover image URL
+      coverImagePrompt = `You are a comic book expert. For the comic "${searchQuery}", provide ONLY a direct URL to a high-quality cover image of this comic book. The URL should end with .jpg, .jpeg, or .png. Respond with ONLY the URL, nothing else. If you cannot find a specific URL, respond with "No image found".`
+
+      coverImageResult = await model.generateContent(coverImagePrompt)
     } else {
       throw new Error('Either image or searchQuery must be provided')
     }
@@ -96,7 +93,7 @@ serve(async (req) => {
     const text = response.text()
     console.log('Raw Gemini response:', text);
 
-    // Parse the structured response with more robust regex patterns
+    // Parse the structured response
     const titleMatch = text.match(/Title:\s*(.+?)(?=\n|$)/i)
     const gradedValueMatch = text.match(/GradedValue:\s*\$?(\d+(?:,\d+)?(?:\.\d+)?)/i)
     const ungradedValueMatch = text.match(/UngradedValue:\s*\$?(\d+(?:,\d+)?(?:\.\d+)?)/i)
@@ -104,14 +101,15 @@ serve(async (req) => {
     const recentUngradedSalesMatch = text.match(/RecentUngradedSales:\s*(.+?)(?=\n(?:[A-Za-z]+:|$))/is)
     const analysisMatch = text.match(/Analysis:\s*(.+?)(?=\n|$)/is)
 
-    console.log('Parsed matches:', {
-      titleMatch,
-      gradedValueMatch,
-      ungradedValueMatch,
-      recentGradedSalesMatch,
-      recentUngradedSalesMatch,
-      analysisMatch
-    });
+    // Get the cover image URL from the second response
+    const coverImageUrl = coverImageResult ? coverImageResult.response.text().trim() : null
+    const validImageUrl = coverImageUrl && (
+      coverImageUrl.endsWith('.jpg') || 
+      coverImageUrl.endsWith('.jpeg') || 
+      coverImageUrl.endsWith('.png')
+    ) ? coverImageUrl : null
+
+    console.log('Cover image URL:', validImageUrl);
 
     // Parse numeric values with fallbacks
     const gradedValue = gradedValueMatch ? 
@@ -137,7 +135,8 @@ serve(async (req) => {
         'No recent ungraded sales data',
       analysis_text: analysisMatch ? 
         analysisMatch[1].trim() : 
-        'Analysis not available'
+        'Analysis not available',
+      cover_image_url: validImageUrl
     }
 
     console.log('Final analysis object:', analysis);
