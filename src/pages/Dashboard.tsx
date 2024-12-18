@@ -11,7 +11,7 @@ const Dashboard = () => {
         <div className="grid gap-8 md:grid-cols-1 lg:grid-cols-1">
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4 text-orange-800">Collection Value Over Time</h2>
-            <div className="h-[400px]">
+            <div className="h-[300px]">
               <ComicValueChart />
             </div>
           </Card>
