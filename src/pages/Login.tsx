@@ -34,6 +34,7 @@ const Login = () => {
                   colors: {
                     brand: '#c45a1c',
                     brandAccent: '#b54a0c',
+                    inputText: '#FFFFFF',
                   }
                 }
               }
