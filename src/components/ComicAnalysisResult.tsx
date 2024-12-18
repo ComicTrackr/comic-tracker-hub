@@ -1,10 +1,8 @@
-import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
 import { useState } from "react";
-import { SalesInfo } from "./comic-analysis/SalesInfo";
-import { ConditionSelector } from "./comic-analysis/ConditionSelector";
+import { SalesInfo } from "@/components/comic-analysis/SalesInfo";
+import { ConditionSelector } from "@/components/comic-analysis/ConditionSelector";
 
-export interface ComicAnalysisResult {
+interface ComicAnalysisResult {
   comic_title: string;
   analysis_text: string;
   graded_value: number;
@@ -20,12 +18,11 @@ interface Props {
 }
 
 const GRADED_CONDITIONS = [
-  "10.0 Gem Mint",
-  "9.9 Mint",
   "9.8 Near Mint/Mint",
   "9.6 Near Mint+",
   "9.4 Near Mint",
   "9.2 Near Mint-",
+  "9.0 Very Fine/Near Mint",
   "8.5 Very Fine+",
   "8.0 Very Fine",
   "7.5 Very Fine-",
@@ -92,50 +89,55 @@ export const ComicAnalysisResult = ({ result, onAddToCollection, onNewSearch }: 
   };
 
   return (
-    <div className="bg-secondary p-4 rounded-lg space-y-4">
-      <div className="flex justify-between items-start">
-        <div className="space-y-4 flex-1 mr-4">
-          <div>
-            <h3 className="font-semibold">{result.comic_title}</h3>
-            <p className="text-sm text-muted-foreground">{result.analysis_text}</p>
-            <div className="mt-2 space-y-1">
-              <p className="text-sm">CGC 9.8 Value: ${result.graded_value.toLocaleString()}</p>
-              <p className="text-sm">Ungraded NM Value: ${result.ungraded_value.toLocaleString()}</p>
-            </div>
-          </div>
-          
-          <SalesInfo 
-            recentGradedSales={result.recent_graded_sales}
-            recentUngradedSales={result.recent_ungraded_sales}
+    <div className="bg-secondary p-4 rounded-lg space-y-4 w-full max-w-full overflow-hidden">
+      <div className="space-y-2">
+        <h3 className="text-lg md:text-xl font-semibold">{result.comic_title}</h3>
+        <p className="text-sm md:text-base whitespace-pre-line">{result.analysis_text}</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <h4 className="font-medium text-sm md:text-base">Graded Value</h4>
+          <p className="text-2xl md:text-3xl font-bold">
+            ${result.graded_value.toLocaleString()}
+          </p>
+        </div>
+        <div className="space-y-2">
+          <h4 className="font-medium text-sm md:text-base">Ungraded Value</h4>
+          <p className="text-2xl md:text-3xl font-bold">
+            ${result.ungraded_value.toLocaleString()}
+          </p>
+        </div>
+      </div>
+
+      <SalesInfo
+        recentGradedSales={result.recent_graded_sales}
+        recentUngradedSales={result.recent_ungraded_sales}
+      />
+
+      <div className="flex flex-col space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <ConditionSelector
+            conditions={GRADED_CONDITIONS}
+            selectedCondition={selectedGradedCondition}
+            onConditionChange={setSelectedGradedCondition}
+            onAddToCollection={handleGradedAdd}
+            label="Add Graded Copy"
+          />
+          <ConditionSelector
+            conditions={UNGRADED_CONDITIONS}
+            selectedCondition={selectedUngradedCondition}
+            onConditionChange={setSelectedUngradedCondition}
+            onAddToCollection={handleUngradedAdd}
+            label="Add Ungraded Copy"
           />
         </div>
-
-        <div className="flex flex-col gap-2">
-          <Button
-            onClick={onNewSearch}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <Search className="h-4 w-4" />
-            New Search
-          </Button>
-          <div className="space-y-2">
-            <ConditionSelector
-              conditions={GRADED_CONDITIONS}
-              selectedCondition={selectedGradedCondition}
-              onConditionChange={setSelectedGradedCondition}
-              onAddToCollection={handleGradedAdd}
-              label="Add Graded Copy"
-            />
-            <ConditionSelector
-              conditions={UNGRADED_CONDITIONS}
-              selectedCondition={selectedUngradedCondition}
-              onConditionChange={setSelectedUngradedCondition}
-              onAddToCollection={handleUngradedAdd}
-              label="Add Ungraded Copy"
-            />
-          </div>
-        </div>
+        <button
+          onClick={onNewSearch}
+          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Start New Search
+        </button>
       </div>
     </div>
   );
