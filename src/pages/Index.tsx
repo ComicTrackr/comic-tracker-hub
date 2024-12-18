@@ -2,7 +2,6 @@ import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { SearchBar } from "@/components/SearchBar";
 import { UploadButton } from "@/components/UploadButton";
-import { PaymentButton } from "@/components/PaymentButton";
 
 const Index = () => {
   return (
@@ -18,11 +17,10 @@ const Index = () => {
             <SearchBar />
           </div>
           
-          <div className="text-center space-y-4">
+          <div className="text-center">
             <div className="text-sm opacity-70">
               Supported formats: JPG, PNG, WEBP • Max file size: 10MB
             </div>
-            <PaymentButton />
           </div>
         </div>
       </main>
