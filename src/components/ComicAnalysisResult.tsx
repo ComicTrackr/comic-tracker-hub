@@ -16,6 +16,8 @@ export interface ComicAnalysisResult {
   analysis_text: string;
   graded_value: number;
   ungraded_value: number;
+  recent_graded_sales: string;
+  recent_ungraded_sales: string;
 }
 
 interface Props {
@@ -69,14 +71,32 @@ export const ComicAnalysisResult = ({ result, onAddToCollection, onNewSearch }: 
   return (
     <div className="bg-secondary p-4 rounded-lg space-y-4">
       <div className="flex justify-between items-start">
-        <div>
-          <h3 className="font-semibold">{result.comic_title}</h3>
-          <p className="text-sm text-muted-foreground">{result.analysis_text}</p>
-          <div className="mt-2 space-y-1">
-            <p className="text-sm">CGC 9.8 Value: ${result.graded_value.toLocaleString()}</p>
-            <p className="text-sm">Ungraded NM Value: ${result.ungraded_value.toLocaleString()}</p>
+        <div className="space-y-4 flex-1 mr-4">
+          <div>
+            <h3 className="font-semibold">{result.comic_title}</h3>
+            <p className="text-sm text-muted-foreground">{result.analysis_text}</p>
+            <div className="mt-2 space-y-1">
+              <p className="text-sm">CGC 9.8 Value: ${result.graded_value.toLocaleString()}</p>
+              <p className="text-sm">Ungraded NM Value: ${result.ungraded_value.toLocaleString()}</p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <h4 className="font-medium text-sm">Recent Graded Sales</h4>
+              <p className="text-sm whitespace-pre-line text-muted-foreground">
+                {result.recent_graded_sales}
+              </p>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-medium text-sm">Recent Ungraded Sales</h4>
+              <p className="text-sm whitespace-pre-line text-muted-foreground">
+                {result.recent_ungraded_sales}
+              </p>
+            </div>
           </div>
         </div>
+
         <div className="flex flex-col gap-2">
           <Button
             onClick={onNewSearch}

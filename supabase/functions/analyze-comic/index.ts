@@ -29,7 +29,8 @@ serve(async (req) => {
       2. Current market values based ONLY on eBay completed sales from the last 30 days:
          - For CGC 9.8 copies: Calculate the average price from the last 3-5 actual CGC 9.8 sales on eBay. If no 9.8 sales exist, use 9.6 and add 20% to estimate 9.8 value
          - For ungraded Near Mint copies: Calculate the average price from the last 3-5 actual raw copy sales on eBay in NM condition
-      3. Include specific eBay sale examples with dates and prices to justify your valuations
+      3. List the 3 most recent graded sales with their grades and prices
+      4. List the 3 most recent ungraded sales with their stated conditions and prices
       
       IMPORTANT GUIDELINES:
       - Only use actual eBay completed sales from the last 30 days
@@ -43,7 +44,9 @@ serve(async (req) => {
       Title: [Comic Title and Issue Number]
       GradedValue: [Average price of recent CGC 9.8 sales on eBay, should be 2-3x higher than ungraded]
       UngradedValue: [Average price of recent NM raw copy sales on eBay]
-      Analysis: [List specific recent eBay sales with dates and prices, followed by market trends and value justification]`
+      RecentGradedSales: [List 3 most recent graded sales with date, grade, and price]
+      RecentUngradedSales: [List 3 most recent ungraded sales with date, condition, and price]
+      Analysis: [Market trends and value justification]`
 
       try {
         console.log('Processing image...');
@@ -77,7 +80,8 @@ serve(async (req) => {
       2. Current market values based ONLY on eBay completed sales from the last 30 days:
          - For CGC 9.8 copies: Calculate the average price from the last 3-5 actual CGC 9.8 sales on eBay. If no 9.8 sales exist, use 9.6 and add 20% to estimate 9.8 value
          - For ungraded Near Mint copies: Calculate the average price from the last 3-5 actual raw copy sales on eBay in NM condition
-      3. Include specific eBay sale examples with dates and prices to justify your valuations
+      3. List the 3 most recent graded sales with their grades and prices
+      4. List the 3 most recent ungraded sales with their stated conditions and prices
       
       IMPORTANT GUIDELINES:
       - Only use actual eBay completed sales from the last 30 days
@@ -91,7 +95,9 @@ serve(async (req) => {
       Title: [Comic Title and Issue Number]
       GradedValue: [Average price of recent CGC 9.8 sales on eBay, should be 2-3x higher than ungraded]
       UngradedValue: [Average price of recent NM raw copy sales on eBay]
-      Analysis: [List specific recent eBay sales with dates and prices, followed by market trends and value justification]`
+      RecentGradedSales: [List 3 most recent graded sales with date, grade, and price]
+      RecentUngradedSales: [List 3 most recent ungraded sales with date, condition, and price]
+      Analysis: [Market trends and value justification]`
 
       result = await model.generateContent(prompt)
     } else {
@@ -105,7 +111,9 @@ serve(async (req) => {
     const titleMatch = text.match(/Title:\s*(.+?)(?=\n|$)/i)
     const gradedValueMatch = text.match(/GradedValue:\s*\$?(\d+(?:,\d+)?(?:\.\d+)?)/i)
     const ungradedValueMatch = text.match(/UngradedValue:\s*\$?(\d+(?:,\d+)?(?:\.\d+)?)/i)
-    const analysisMatch = text.match(/Analysis:\s*(.+?)(?=\n|$)/i)
+    const recentGradedSalesMatch = text.match(/RecentGradedSales:\s*(.+?)(?=\n(?:[A-Za-z]+:|$))/is)
+    const recentUngradedSalesMatch = text.match(/RecentUngradedSales:\s*(.+?)(?=\n(?:[A-Za-z]+:|$))/is)
+    const analysisMatch = text.match(/Analysis:\s*(.+?)(?=\n|$)/is)
 
     const gradedValue = gradedValueMatch ? 
       parseFloat(gradedValueMatch[1].replace(/,/g, '')) : 
@@ -122,6 +130,8 @@ serve(async (req) => {
       comic_title: titleMatch ? titleMatch[1].trim() : searchQuery,
       graded_value: finalGradedValue,
       ungraded_value: ungradedValue,
+      recent_graded_sales: recentGradedSalesMatch ? recentGradedSalesMatch[1].trim() : '',
+      recent_ungraded_sales: recentUngradedSalesMatch ? recentUngradedSalesMatch[1].trim() : '',
       analysis_text: analysisMatch ? analysisMatch[1].trim() : text
     }
 
