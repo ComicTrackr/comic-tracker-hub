@@ -43,41 +43,49 @@ export const ComicCollection = () => {
   }, []);
 
   return (
-    <div className="w-full overflow-x-auto rounded-lg border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="text-orange-800 min-w-[200px]">Title</TableHead>
-            <TableHead className="text-orange-800 min-w-[120px]">Condition</TableHead>
-            <TableHead className="text-orange-800 min-w-[100px]">Value</TableHead>
-            <TableHead className="text-orange-800 min-w-[100px]">Added</TableHead>
-            <TableHead className="text-orange-800 w-[60px]">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {comics.map((comic) => (
-            <TableRow key={comic.id}>
-              <TableCell className="font-medium break-words">{comic.comic_title}</TableCell>
-              <TableCell className="whitespace-normal">{comic.condition_rating || 'N/A'}</TableCell>
-              <TableCell>
-                {comic.estimated_value 
-                  ? `$${comic.estimated_value.toLocaleString()}`
-                  : 'N/A'
-                }
-              </TableCell>
-              <TableCell className="whitespace-nowrap">
-                {new Date(comic.added_at).toLocaleDateString()}
-              </TableCell>
-              <TableCell>
-                <DeleteComicButton 
-                  comicId={comic.id}
-                  onDelete={fetchComics}
-                />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+    <div className="w-full overflow-x-auto -mx-4 sm:mx-0">
+      <div className="min-w-full inline-block align-middle">
+        <div className="overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-orange-800 min-w-[140px] md:min-w-[200px] px-2 md:px-4">Title</TableHead>
+                <TableHead className="text-orange-800 min-w-[100px] px-2 md:px-4">Condition</TableHead>
+                <TableHead className="text-orange-800 min-w-[80px] px-2 md:px-4">Value</TableHead>
+                <TableHead className="text-orange-800 min-w-[90px] px-2 md:px-4">Added</TableHead>
+                <TableHead className="text-orange-800 w-[50px] px-2 md:px-4">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {comics.map((comic) => (
+                <TableRow key={comic.id}>
+                  <TableCell className="font-medium break-words px-2 md:px-4 text-sm md:text-base">
+                    {comic.comic_title}
+                  </TableCell>
+                  <TableCell className="whitespace-normal px-2 md:px-4 text-sm md:text-base">
+                    {comic.condition_rating || 'N/A'}
+                  </TableCell>
+                  <TableCell className="px-2 md:px-4 text-sm md:text-base">
+                    {comic.estimated_value 
+                      ? `$${comic.estimated_value.toLocaleString()}`
+                      : 'N/A'
+                    }
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap px-2 md:px-4 text-sm md:text-base">
+                    {new Date(comic.added_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell className="px-2 md:px-4">
+                    <DeleteComicButton 
+                      comicId={comic.id}
+                      onDelete={fetchComics}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
     </div>
   );
 };
