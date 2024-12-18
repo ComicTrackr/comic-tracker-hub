@@ -10,29 +10,6 @@ function processBase64Image(base64Image: string): string {
   return base64Image.includes(',') ? base64Image.split(',')[1] : base64Image;
 }
 
-function calculateValue(condition: number, rarity: string, baseValue: number): number {
-  // Condition multiplier (1-10 scale)
-  const conditionMultiplier = condition / 5;
-
-  // Rarity multiplier
-  const rarityMultipliers: { [key: string]: number } = {
-    'common': 1,
-    'uncommon': 1.5,
-    'rare': 3,
-    'very rare': 5,
-    'ultra rare': 10,
-    'grail': 20
-  };
-
-  const rarityMultiplier = rarityMultipliers[rarity.toLowerCase()] || 1;
-
-  // Calculate final value
-  let finalValue = baseValue * conditionMultiplier * rarityMultiplier;
-
-  // Round to nearest dollar
-  return Math.round(finalValue);
-}
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -46,18 +23,14 @@ serve(async (req) => {
     let prompt, result
 
     if (image) {
-      prompt = `You are a comic book expert and appraiser. Analyze this comic book cover image and provide:
-      1. The exact title and issue number of the comic book
-      2. A condition rating on a scale of 1-10 (be very critical and precise)
-      3. The rarity level (common, uncommon, rare, very rare, ultra rare, or grail)
-      4. A base market value in USD for this issue in average condition
-      5. A brief analysis of notable features, significance, or historical context
+      prompt = `You are a comic book expert and market analyst. For this comic cover image, provide:
+      1. The exact title and issue number
+      2. Recent market value data (average selling price in USD)
+      3. Key issue information or significant details about this specific issue
       Format your response exactly like this:
       Title: [Comic Title and Issue Number]
-      Condition: [1-10]
-      Rarity: [Rarity Level]
-      BaseValue: [USD amount]
-      Analysis: [Your detailed analysis]`
+      BaseValue: [USD amount based on recent sales]
+      Analysis: [Key issue status, significant events, or notable features of this specific issue]`
 
       try {
         console.log('Processing image...');
@@ -85,18 +58,14 @@ serve(async (req) => {
         throw new Error('Failed to process image: ' + imageError.message);
       }
     } else if (searchQuery) {
-      prompt = `You are a comic book expert and appraiser. For the comic "${searchQuery}", provide:
+      prompt = `You are a comic book expert and market analyst. For the comic "${searchQuery}", provide:
       1. The exact title and issue number
-      2. A condition rating of 9 (assuming near mint)
-      3. The rarity level (common, uncommon, rare, very rare, ultra rare, or grail)
-      4. A base market value in USD for this issue in average condition
-      5. A brief analysis of notable features, significance, or historical context
+      2. Recent market value data (average selling price in USD)
+      3. Key issue information or significant details about this specific issue
       Format your response exactly like this:
       Title: [Comic Title and Issue Number]
-      Condition: [9]
-      Rarity: [Rarity Level]
-      BaseValue: [USD amount]
-      Analysis: [Your detailed analysis]`
+      BaseValue: [USD amount based on recent sales]
+      Analysis: [Key issue status, significant events, or notable features of this specific issue]`
 
       result = await model.generateContent(prompt)
     } else {
@@ -108,25 +77,17 @@ serve(async (req) => {
 
     // Parse the structured response
     const titleMatch = text.match(/Title:\s*(.+?)(?=\n|$)/i)
-    const conditionMatch = text.match(/Condition:\s*(\d+)/i)
-    const rarityMatch = text.match(/Rarity:\s*(.+?)(?=\n|$)/i)
     const baseValueMatch = text.match(/BaseValue:\s*\$?(\d+(?:,\d+)?(?:\.\d+)?)/i)
     const analysisMatch = text.match(/Analysis:\s*(.+?)(?=\n|$)/i)
 
-    // Extract values
-    const condition = conditionMatch ? parseInt(conditionMatch[1]) : 9
-    const rarity = rarityMatch ? rarityMatch[1].trim() : 'common'
     const baseValue = baseValueMatch ? 
       parseFloat(baseValueMatch[1].replace(/,/g, '')) : 
       100
 
-    // Calculate final estimated value
-    const estimatedValue = calculateValue(condition, rarity, baseValue)
-
     const analysis = {
       comic_title: titleMatch ? titleMatch[1].trim() : searchQuery,
-      condition_rating: condition.toString(),
-      estimated_value: estimatedValue,
+      condition_rating: "N/A", // We're no longer providing condition ratings
+      estimated_value: baseValue,
       analysis_text: analysisMatch ? analysisMatch[1].trim() : text
     }
 
