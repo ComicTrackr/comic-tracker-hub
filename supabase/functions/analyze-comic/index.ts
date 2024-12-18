@@ -7,6 +7,7 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -14,7 +15,7 @@ serve(async (req) => {
   try {
     const { image, searchQuery } = await req.json()
     const genAI = new GoogleGenerativeAI(Deno.env.get('GEMINI_API_KEY'))
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
+    const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" })
 
     let prompt, result
 
@@ -31,12 +32,15 @@ serve(async (req) => {
       Value: [USD amount]
       Analysis: [Your detailed analysis]`
 
+      // Convert base64 to Uint8Array for Gemini
+      const imageData = Uint8Array.from(atob(image.split(',')[1]), c => c.charCodeAt(0))
+
       result = await model.generateContent([
         prompt,
         {
           inlineData: {
             mimeType: "image/jpeg",
-            data: image.split(',')[1]
+            data: imageData
           }
         }
       ])
@@ -73,20 +77,31 @@ serve(async (req) => {
       estimated_value: valueMatch 
         ? parseFloat(valueMatch[1].replace(/,/g, ''))
         : 100,
-      text: analysisMatch ? analysisMatch[1].trim() : text
+      analysis_text: analysisMatch ? analysisMatch[1].trim() : text
     }
 
     console.log('Analysis completed:', analysis)
 
     return new Response(
       JSON.stringify(analysis),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        } 
+      }
     )
   } catch (error) {
     console.error('Error:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      { 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        }, 
+        status: 500 
+      }
     )
   }
 })
