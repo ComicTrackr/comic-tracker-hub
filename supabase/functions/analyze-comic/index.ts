@@ -29,8 +29,8 @@ serve(async (req) => {
       2. Current market values based ONLY on eBay completed sales from the last 30 days:
          - For CGC 9.8 copies: Calculate the average price from the last 3-5 actual CGC 9.8 sales on eBay. If no 9.8 sales exist, use 9.6 and add 20% to estimate 9.8 value
          - For ungraded Near Mint copies: Calculate the average price from the last 3-5 actual raw copy sales on eBay in NM condition
-      3. List the 3 most recent graded sales with their grades and prices
-      4. List the 3 most recent ungraded sales with their stated conditions and prices
+      3. For graded copies: Find the highest and lowest recent sale prices, including their grades
+      4. For ungraded copies: Find the highest and lowest recent sale prices, including their conditions
       
       IMPORTANT GUIDELINES:
       - Only use actual eBay completed sales from the last 30 days
@@ -44,8 +44,8 @@ serve(async (req) => {
       Title: [Comic Title and Issue Number]
       GradedValue: [Average price of recent CGC 9.8 sales on eBay, should be 2-3x higher than ungraded]
       UngradedValue: [Average price of recent NM raw copy sales on eBay]
-      RecentGradedSales: [List 3 most recent graded sales with date, grade, and price]
-      RecentUngradedSales: [List 3 most recent ungraded sales with date, condition, and price]
+      RecentGradedSales: [Highest graded sale: Grade, Price] | [Lowest graded sale: Grade, Price]
+      RecentUngradedSales: [Highest raw sale: Condition, Price] | [Lowest raw sale: Condition, Price]
       Analysis: [Market trends and value justification]`
 
       try {
@@ -80,8 +80,8 @@ serve(async (req) => {
       2. Current market values based ONLY on eBay completed sales from the last 30 days:
          - For CGC 9.8 copies: Calculate the average price from the last 3-5 actual CGC 9.8 sales on eBay. If no 9.8 sales exist, use 9.6 and add 20% to estimate 9.8 value
          - For ungraded Near Mint copies: Calculate the average price from the last 3-5 actual raw copy sales on eBay in NM condition
-      3. List the 3 most recent graded sales with their grades and prices
-      4. List the 3 most recent ungraded sales with their stated conditions and prices
+      3. For graded copies: Find the highest and lowest recent sale prices, including their grades
+      4. For ungraded copies: Find the highest and lowest recent sale prices, including their conditions
       
       IMPORTANT GUIDELINES:
       - Only use actual eBay completed sales from the last 30 days
@@ -95,8 +95,8 @@ serve(async (req) => {
       Title: [Comic Title and Issue Number]
       GradedValue: [Average price of recent CGC 9.8 sales on eBay, should be 2-3x higher than ungraded]
       UngradedValue: [Average price of recent NM raw copy sales on eBay]
-      RecentGradedSales: [List 3 most recent graded sales with date, grade, and price]
-      RecentUngradedSales: [List 3 most recent ungraded sales with date, condition, and price]
+      RecentGradedSales: [Highest graded sale: Grade, Price] | [Lowest graded sale: Grade, Price]
+      RecentUngradedSales: [Highest raw sale: Condition, Price] | [Lowest raw sale: Condition, Price]
       Analysis: [Market trends and value justification]`
 
       result = await model.generateContent(prompt)

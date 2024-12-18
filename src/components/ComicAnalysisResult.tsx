@@ -16,8 +16,8 @@ export interface ComicAnalysisResult {
   analysis_text: string;
   graded_value: number;
   ungraded_value: number;
-  recent_graded_sales: string;  // Ensure these properties are defined
-  recent_ungraded_sales: string;  // Ensure these properties are defined
+  recent_graded_sales: string;
+  recent_ungraded_sales: string;
 }
 
 interface Props {
@@ -83,13 +83,13 @@ export const ComicAnalysisResult = ({ result, onAddToCollection, onNewSearch }: 
           
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <h4 className="font-medium text-sm">Recent Graded Sales</h4>
+              <h4 className="font-medium text-sm">Recent Graded Sales Range</h4>
               <p className="text-sm whitespace-pre-line text-muted-foreground">
                 {result.recent_graded_sales}
               </p>
             </div>
             <div className="space-y-2">
-              <h4 className="font-medium text-sm">Recent Ungraded Sales</h4>
+              <h4 className="font-medium text-sm">Recent Ungraded Sales Range</h4>
               <p className="text-sm whitespace-pre-line text-muted-foreground">
                 {result.recent_ungraded_sales}
               </p>
