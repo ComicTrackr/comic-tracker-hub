@@ -44,20 +44,22 @@ serve(async (req) => {
       try {
         console.log('Processing image...');
         const processedImage = processBase64Image(image);
+        console.log('Image processed, attempting analysis...');
         
-        result = await model.generateContent([
-          {
+        result = await model.generateContent({
+          contents: [{
+            role: "user",
             parts: [
               { text: prompt },
               {
-                inlineData: {
-                  mimeType: "image/jpeg",
+                inline_data: {
+                  mime_type: "image/jpeg",
                   data: processedImage
                 }
               }
             ]
-          }
-        ]);
+          }]
+        });
         
         console.log('Analysis completed successfully');
       } catch (imageError) {
