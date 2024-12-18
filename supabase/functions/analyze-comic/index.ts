@@ -25,11 +25,12 @@ serve(async (req) => {
     if (image) {
       prompt = `You are a comic book expert and market analyst. For this comic cover image, provide:
       1. The exact title and issue number
-      2. Recent market value data (average selling price in USD)
+      2. Recent market value data for both graded (CGC 9.8) and ungraded Near Mint copies in USD
       3. Key issue information or significant details about this specific issue
       Format your response exactly like this:
       Title: [Comic Title and Issue Number]
-      BaseValue: [USD amount based on recent sales]
+      GradedValue: [USD amount for CGC 9.8]
+      UngradedValue: [USD amount for raw Near Mint]
       Analysis: [Key issue status, significant events, or notable features of this specific issue]`
 
       try {
@@ -60,11 +61,12 @@ serve(async (req) => {
     } else if (searchQuery) {
       prompt = `You are a comic book expert and market analyst. For the comic "${searchQuery}", provide:
       1. The exact title and issue number
-      2. Recent market value data (average selling price in USD)
+      2. Recent market value data for both graded (CGC 9.8) and ungraded Near Mint copies in USD
       3. Key issue information or significant details about this specific issue
       Format your response exactly like this:
       Title: [Comic Title and Issue Number]
-      BaseValue: [USD amount based on recent sales]
+      GradedValue: [USD amount for CGC 9.8]
+      UngradedValue: [USD amount for raw Near Mint]
       Analysis: [Key issue status, significant events, or notable features of this specific issue]`
 
       result = await model.generateContent(prompt)
@@ -77,17 +79,22 @@ serve(async (req) => {
 
     // Parse the structured response
     const titleMatch = text.match(/Title:\s*(.+?)(?=\n|$)/i)
-    const baseValueMatch = text.match(/BaseValue:\s*\$?(\d+(?:,\d+)?(?:\.\d+)?)/i)
+    const gradedValueMatch = text.match(/GradedValue:\s*\$?(\d+(?:,\d+)?(?:\.\d+)?)/i)
+    const ungradedValueMatch = text.match(/UngradedValue:\s*\$?(\d+(?:,\d+)?(?:\.\d+)?)/i)
     const analysisMatch = text.match(/Analysis:\s*(.+?)(?=\n|$)/i)
 
-    const baseValue = baseValueMatch ? 
-      parseFloat(baseValueMatch[1].replace(/,/g, '')) : 
-      100
+    const gradedValue = gradedValueMatch ? 
+      parseFloat(gradedValueMatch[1].replace(/,/g, '')) : 
+      0
+
+    const ungradedValue = ungradedValueMatch ? 
+      parseFloat(ungradedValueMatch[1].replace(/,/g, '')) : 
+      0
 
     const analysis = {
       comic_title: titleMatch ? titleMatch[1].trim() : searchQuery,
-      condition_rating: "N/A", // We're no longer providing condition ratings
-      estimated_value: baseValue,
+      graded_value: gradedValue,
+      ungraded_value: ungradedValue,
       analysis_text: analysisMatch ? analysisMatch[1].trim() : text
     }
 

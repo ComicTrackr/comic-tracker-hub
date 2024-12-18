@@ -37,25 +37,12 @@ export const SearchBar = () => {
 
       if (error) throw error;
 
-      // Save the analysis to the database
-      const { error: insertError } = await supabase
-        .from('comic_analyses')
-        .insert({
-          user_id: user.id,
-          comic_title: analysis.comic_title,
-          analysis_text: analysis.analysis_text,
-          condition_rating: analysis.condition_rating,
-          estimated_value: analysis.estimated_value
-        });
-
-      if (insertError) throw insertError;
-
       // Update the UI with the analysis result
       setAnalysisResult({
         comic_title: analysis.comic_title,
         analysis_text: analysis.analysis_text,
-        condition_rating: analysis.condition_rating,
-        estimated_value: analysis.estimated_value
+        graded_value: analysis.graded_value,
+        ungraded_value: analysis.ungraded_value
       });
 
       toast({
@@ -96,7 +83,7 @@ export const SearchBar = () => {
       {analysisResult && (
         <ComicAnalysisResult 
           result={analysisResult}
-          onAddToCollection={() => addToCollection(analysisResult)}
+          onAddToCollection={(isGraded) => addToCollection(analysisResult, isGraded)}
           onNewSearch={handleNewSearch}
         />
       )}

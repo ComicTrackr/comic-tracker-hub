@@ -6,13 +6,13 @@ import { useToast } from "@/components/ui/use-toast";
 export interface ComicAnalysisResult {
   comic_title: string;
   analysis_text: string;
-  condition_rating: string;
-  estimated_value: number;
+  graded_value: number;
+  ungraded_value: number;
 }
 
 interface Props {
   result: ComicAnalysisResult;
-  onAddToCollection: () => void;
+  onAddToCollection: (isGraded: boolean) => void;
   onNewSearch: () => void;
 }
 
@@ -23,10 +23,12 @@ export const ComicAnalysisResult = ({ result, onAddToCollection, onNewSearch }: 
         <div>
           <h3 className="font-semibold">{result.comic_title}</h3>
           <p className="text-sm text-muted-foreground">{result.analysis_text}</p>
-          <p className="text-sm">Condition: {result.condition_rating}</p>
-          <p className="text-sm">Estimated Value: ${result.estimated_value}</p>
+          <div className="mt-2 space-y-1">
+            <p className="text-sm">CGC 9.8 Value: ${result.graded_value.toLocaleString()}</p>
+            <p className="text-sm">Ungraded NM Value: ${result.ungraded_value.toLocaleString()}</p>
+          </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2">
           <Button
             onClick={onNewSearch}
             variant="outline"
@@ -36,12 +38,20 @@ export const ComicAnalysisResult = ({ result, onAddToCollection, onNewSearch }: 
             New Search
           </Button>
           <Button
-            onClick={onAddToCollection}
+            onClick={() => onAddToCollection(true)}
             variant="outline"
             className="flex items-center gap-2"
           >
             <PlusCircle className="h-4 w-4" />
-            Add to Collection
+            Add Graded Copy
+          </Button>
+          <Button
+            onClick={() => onAddToCollection(false)}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <PlusCircle className="h-4 w-4" />
+            Add Ungraded Copy
           </Button>
         </div>
       </div>

@@ -7,7 +7,7 @@ export const useComicCollection = () => {
   const { toast } = useToast();
   const [analysisResult, setAnalysisResult] = useState<ComicAnalysisResult | null>(null);
 
-  const addToCollection = async (result: ComicAnalysisResult) => {
+  const addToCollection = async (result: ComicAnalysisResult, isGraded: boolean) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -25,8 +25,7 @@ export const useComicCollection = () => {
         .insert({
           user_id: user.id,
           comic_title: result.comic_title,
-          condition_rating: result.condition_rating,
-          estimated_value: result.estimated_value
+          estimated_value: isGraded ? result.graded_value : result.ungraded_value
         });
 
       if (error) throw error;
