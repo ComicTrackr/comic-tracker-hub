@@ -44,7 +44,7 @@ export const SearchBar = () => {
         ungraded_value: analysis.ungraded_value,
         recent_graded_sales: analysis.recent_graded_sales || '',
         recent_ungraded_sales: analysis.recent_ungraded_sales || '',
-        cover_image_url: analysis.cover_image_url || null
+        cover_image_url: analysis.cover_image_url
       });
 
       toast({
