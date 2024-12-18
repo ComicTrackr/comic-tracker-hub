@@ -2,11 +2,10 @@ import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { SearchBar } from "@/components/SearchBar";
 import { UploadButton } from "@/components/UploadButton";
-import { Toaster } from "@/components/ui/toaster";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <>
       <Navbar />
       <main className="container mx-auto px-4 pt-24 pb-12 space-y-12">
         <Hero />
@@ -23,8 +22,7 @@ const Index = () => {
           </div>
         </div>
       </main>
-      <Toaster />
-    </div>
+    </>
   );
 };
 
