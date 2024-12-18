@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -13,9 +13,10 @@ export interface ComicAnalysisResult {
 interface Props {
   result: ComicAnalysisResult;
   onAddToCollection: () => void;
+  onNewSearch: () => void;
 }
 
-export const ComicAnalysisResult = ({ result, onAddToCollection }: Props) => {
+export const ComicAnalysisResult = ({ result, onAddToCollection, onNewSearch }: Props) => {
   return (
     <div className="bg-secondary p-4 rounded-lg space-y-4">
       <div className="flex justify-between items-start">
@@ -25,14 +26,24 @@ export const ComicAnalysisResult = ({ result, onAddToCollection }: Props) => {
           <p className="text-sm">Condition: {result.condition_rating}</p>
           <p className="text-sm">Estimated Value: ${result.estimated_value}</p>
         </div>
-        <Button
-          onClick={onAddToCollection}
-          variant="outline"
-          className="flex items-center gap-2"
-        >
-          <PlusCircle className="h-4 w-4" />
-          Add to Collection
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={onNewSearch}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Search className="h-4 w-4" />
+            New Search
+          </Button>
+          <Button
+            onClick={onAddToCollection}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <PlusCircle className="h-4 w-4" />
+            Add to Collection
+          </Button>
+        </div>
       </div>
     </div>
   );

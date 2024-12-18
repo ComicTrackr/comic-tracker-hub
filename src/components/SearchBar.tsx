@@ -42,7 +42,7 @@ export const SearchBar = () => {
         .insert({
           user_id: user.id,
           comic_title: searchQuery.trim(),
-          analysis_text: analysis.text,
+          analysis_text: analysis.analysis_text,
           condition_rating: analysis.condition_rating,
           estimated_value: analysis.estimated_value
         });
@@ -51,7 +51,7 @@ export const SearchBar = () => {
 
       setAnalysisResult({
         comic_title: searchQuery.trim(),
-        analysis_text: analysis.text,
+        analysis_text: analysis.analysis_text,
         condition_rating: analysis.condition_rating,
         estimated_value: analysis.estimated_value
       });
@@ -69,6 +69,11 @@ export const SearchBar = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleNewSearch = () => {
+    setAnalysisResult(null);
+    setSearchQuery("");
   };
 
   return (
@@ -90,6 +95,7 @@ export const SearchBar = () => {
         <ComicAnalysisResult 
           result={analysisResult}
           onAddToCollection={() => addToCollection(analysisResult)}
+          onNewSearch={handleNewSearch}
         />
       )}
     </div>

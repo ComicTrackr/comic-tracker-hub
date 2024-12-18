@@ -15,6 +15,10 @@ export const UploadButton = () => {
     }
   };
 
+  const handleNewSearch = () => {
+    setAnalysisResult(null);
+  };
+
   return (
     <div className="space-y-4">
       <Button
@@ -42,6 +46,7 @@ export const UploadButton = () => {
         <ComicAnalysisResult 
           result={analysisResult}
           onAddToCollection={() => addToCollection(analysisResult)}
+          onNewSearch={handleNewSearch}
         />
       )}
     </div>
