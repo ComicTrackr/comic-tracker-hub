@@ -23,21 +23,26 @@ serve(async (req) => {
     let prompt, result
 
     if (image) {
-      prompt = `You are a comic book expert and market analyst with access to current market data. For this comic cover image, provide:
+      prompt = `You are a comic book expert specializing in eBay market analysis. For this comic cover image, provide a detailed analysis focusing EXCLUSIVELY on eBay's recently sold listings from the last 30 days:
+
       1. The exact title and issue number
-      2. Current market value data based on recent eBay sales and market trends:
-         - For CGC 9.8 copies: Use actual recent sales data, focusing on the last 3-6 months
-         - For ungraded Near Mint copies: Use actual raw copy sales data from the last 3-6 months
-      3. Key issue information or significant details about this specific issue
+      2. Current market values based ONLY on eBay completed sales from the last 30 days:
+         - For CGC 9.8 copies: Calculate the average price from the last 3-5 actual CGC 9.8 sales on eBay
+         - For ungraded Near Mint copies: Calculate the average price from the last 3-5 actual raw copy sales on eBay in NM condition
+      3. Include specific eBay sale examples with dates and prices to justify your valuations
       
-      Be conservative with valuations and base them strictly on verifiable recent sales data.
-      If this is a modern comic (published in the last 5 years), be especially careful not to overvalue it.
+      IMPORTANT GUIDELINES:
+      - Only use actual eBay completed sales from the last 30 days
+      - If there aren't enough recent sales in 9.8, use the next highest grade with sales data
+      - For raw copies, only consider listings that specifically mention Near Mint or NM condition
+      - Exclude outlier prices that are significantly higher or lower than the average
+      - For modern comics (last 5 years), focus on the most recent sales as prices can fluctuate rapidly
       
       Format your response exactly like this:
       Title: [Comic Title and Issue Number]
-      GradedValue: [USD amount for CGC 9.8 based on recent sales]
-      UngradedValue: [USD amount for raw Near Mint based on recent sales]
-      Analysis: [Key issue status, significant events, market trends, and price justification based on recent sales data]`
+      GradedValue: [Average price of recent CGC 9.8 sales on eBay]
+      UngradedValue: [Average price of recent NM raw copy sales on eBay]
+      Analysis: [List specific recent eBay sales with dates and prices, followed by market trends and value justification]`
 
       try {
         console.log('Processing image...');
@@ -65,21 +70,26 @@ serve(async (req) => {
         throw new Error('Failed to process image: ' + imageError.message);
       }
     } else if (searchQuery) {
-      prompt = `You are a comic book expert and market analyst with access to current market data. For the comic "${searchQuery}", provide:
+      prompt = `You are a comic book expert specializing in eBay market analysis. For the comic "${searchQuery}", provide a detailed analysis focusing EXCLUSIVELY on eBay's recently sold listings from the last 30 days:
+
       1. The exact title and issue number
-      2. Current market value data based on recent eBay sales and market trends:
-         - For CGC 9.8 copies: Use actual recent sales data, focusing on the last 3-6 months
-         - For ungraded Near Mint copies: Use actual raw copy sales data from the last 3-6 months
-      3. Key issue information or significant details about this specific issue
+      2. Current market values based ONLY on eBay completed sales from the last 30 days:
+         - For CGC 9.8 copies: Calculate the average price from the last 3-5 actual CGC 9.8 sales on eBay
+         - For ungraded Near Mint copies: Calculate the average price from the last 3-5 actual raw copy sales on eBay in NM condition
+      3. Include specific eBay sale examples with dates and prices to justify your valuations
       
-      Be conservative with valuations and base them strictly on verifiable recent sales data.
-      If this is a modern comic (published in the last 5 years), be especially careful not to overvalue it.
+      IMPORTANT GUIDELINES:
+      - Only use actual eBay completed sales from the last 30 days
+      - If there aren't enough recent sales in 9.8, use the next highest grade with sales data
+      - For raw copies, only consider listings that specifically mention Near Mint or NM condition
+      - Exclude outlier prices that are significantly higher or lower than the average
+      - For modern comics (last 5 years), focus on the most recent sales as prices can fluctuate rapidly
       
       Format your response exactly like this:
       Title: [Comic Title and Issue Number]
-      GradedValue: [USD amount for CGC 9.8 based on recent sales]
-      UngradedValue: [USD amount for raw Near Mint based on recent sales]
-      Analysis: [Key issue status, significant events, market trends, and price justification based on recent sales data]`
+      GradedValue: [Average price of recent CGC 9.8 sales on eBay]
+      UngradedValue: [Average price of recent NM raw copy sales on eBay]
+      Analysis: [List specific recent eBay sales with dates and prices, followed by market trends and value justification]`
 
       result = await model.generateContent(prompt)
     } else {
