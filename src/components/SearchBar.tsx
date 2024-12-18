@@ -1,28 +1,21 @@
 import { useState } from "react";
-import { Search, PlusCircle } from "lucide-react";
+import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-
-interface SearchResult {
-  comic_title: string;
-  analysis_text: string;
-  condition_rating: string;
-  estimated_value: number;
-}
+import { useComicCollection } from "@/hooks/useComicCollection";
+import { ComicAnalysisResult } from "@/components/ComicAnalysisResult";
 
 export const SearchBar = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
   const { toast } = useToast();
+  const { analysisResult, setAnalysisResult, addToCollection } = useComicCollection();
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
 
     try {
-      // Get the current user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast({
@@ -44,7 +37,6 @@ export const SearchBar = () => {
 
       if (error) throw error;
 
-      // Store the analysis results
       const { error: insertError } = await supabase
         .from('comic_analyses')
         .insert({
@@ -57,7 +49,7 @@ export const SearchBar = () => {
 
       if (insertError) throw insertError;
 
-      setSearchResult({
+      setAnalysisResult({
         comic_title: searchQuery.trim(),
         analysis_text: analysis.text,
         condition_rating: analysis.condition_rating,
@@ -79,50 +71,6 @@ export const SearchBar = () => {
     }
   };
 
-  const addToCollection = async () => {
-    if (!searchResult) return;
-
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          title: "Authentication required",
-          description: "Please log in to add comics to your collection",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const { error } = await supabase
-        .from('user_comics')
-        .insert({
-          user_id: user.id,
-          comic_title: searchResult.comic_title,
-          condition_rating: searchResult.condition_rating,
-          estimated_value: searchResult.estimated_value
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Comic added to your collection!",
-      });
-
-      // Clear the search result after adding to collection
-      setSearchResult(null);
-      setSearchQuery("");
-
-    } catch (error) {
-      console.error('Error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add comic to collection",
-        variant: "destructive",
-      });
-    }
-  };
-
   return (
     <div className="space-y-4 w-full max-w-xl">
       <form onSubmit={handleSearch} className="relative">
@@ -138,25 +86,11 @@ export const SearchBar = () => {
         </button>
       </form>
 
-      {searchResult && (
-        <div className="bg-secondary p-4 rounded-lg space-y-4">
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className="font-semibold">{searchResult.comic_title}</h3>
-              <p className="text-sm text-muted-foreground">{searchResult.analysis_text}</p>
-              <p className="text-sm">Condition: {searchResult.condition_rating}</p>
-              <p className="text-sm">Estimated Value: ${searchResult.estimated_value}</p>
-            </div>
-            <Button
-              onClick={addToCollection}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <PlusCircle className="h-4 w-4" />
-              Add to Collection
-            </Button>
-          </div>
-        </div>
+      {analysisResult && (
+        <ComicAnalysisResult 
+          result={analysisResult}
+          onAddToCollection={() => addToCollection(analysisResult)}
+        />
       )}
     </div>
   );

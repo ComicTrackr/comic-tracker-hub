@@ -1,26 +1,20 @@
 import { useState } from 'react';
-import { Upload, PlusCircle } from "lucide-react";
+import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-
-interface AnalysisResult {
-  comic_title: string;
-  analysis_text: string;
-  condition_rating: string;
-  estimated_value: number;
-}
+import { useComicCollection } from "@/hooks/useComicCollection";
+import { ComicAnalysisResult } from "@/components/ComicAnalysisResult";
 
 export const UploadButton = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const { toast } = useToast();
+  const { analysisResult, setAnalysisResult, addToCollection } = useComicCollection();
 
   const analyzeComic = async (file: File) => {
     try {
       setIsAnalyzing(true);
       
-      // Convert the image to base64
       const reader = new FileReader();
       const base64Promise = new Promise((resolve) => {
         reader.onload = () => resolve(reader.result);
@@ -28,7 +22,6 @@ export const UploadButton = () => {
       });
       const base64 = await base64Promise;
 
-      // Get the current user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast({
@@ -44,17 +37,15 @@ export const UploadButton = () => {
         description: "Please wait while we analyze your comic cover",
       });
 
-      // Call the Edge Function to analyze the image
       const { data: analysis, error } = await supabase.functions.invoke('analyze-comic', {
         body: {
           image: base64,
-          title: file.name.replace(/\.[^/.]+$/, "") // Remove file extension
+          title: file.name.replace(/\.[^/.]+$/, "")
         }
       });
 
       if (error) throw error;
 
-      // Store the analysis results
       const { error: insertError } = await supabase
         .from('comic_analyses')
         .insert({
@@ -92,49 +83,6 @@ export const UploadButton = () => {
     }
   };
 
-  const addToCollection = async () => {
-    if (!analysisResult) return;
-
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          title: "Authentication required",
-          description: "Please log in to add comics to your collection",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const { error } = await supabase
-        .from('user_comics')
-        .insert({
-          user_id: user.id,
-          comic_title: analysisResult.comic_title,
-          condition_rating: analysisResult.condition_rating,
-          estimated_value: analysisResult.estimated_value
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Comic added to your collection!",
-      });
-
-      // Clear the analysis result after adding to collection
-      setAnalysisResult(null);
-
-    } catch (error) {
-      console.error('Error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add comic to collection",
-        variant: "destructive",
-      });
-    }
-  };
-
   return (
     <div className="space-y-4">
       <Button
@@ -159,24 +107,10 @@ export const UploadButton = () => {
       </Button>
 
       {analysisResult && (
-        <div className="bg-secondary p-4 rounded-lg space-y-4">
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className="font-semibold">{analysisResult.comic_title}</h3>
-              <p className="text-sm text-muted-foreground">{analysisResult.analysis_text}</p>
-              <p className="text-sm">Condition: {analysisResult.condition_rating}</p>
-              <p className="text-sm">Estimated Value: ${analysisResult.estimated_value}</p>
-            </div>
-            <Button
-              onClick={addToCollection}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <PlusCircle className="h-4 w-4" />
-              Add to Collection
-            </Button>
-          </div>
-        </div>
+        <ComicAnalysisResult 
+          result={analysisResult}
+          onAddToCollection={() => addToCollection(analysisResult)}
+        />
       )}
     </div>
   );
