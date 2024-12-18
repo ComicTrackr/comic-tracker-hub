@@ -2,6 +2,7 @@ import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { SearchBar } from "@/components/SearchBar";
 import { UploadButton } from "@/components/UploadButton";
+import { Toaster } from "@/components/ui/toaster";
 
 const Index = () => {
   return (
@@ -22,6 +23,7 @@ const Index = () => {
           </div>
         </div>
       </main>
+      <Toaster />
     </div>
   );
 };
