@@ -31,6 +31,11 @@ export const UploadButton = () => {
         return;
       }
 
+      toast({
+        title: "Analyzing...",
+        description: "Please wait while we analyze your comic cover",
+      });
+
       // Call the Edge Function to analyze the image
       const { data: analysis, error } = await supabase.functions.invoke('analyze-comic', {
         body: {
