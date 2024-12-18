@@ -15,7 +15,7 @@ export interface ComicAnalysisResult {
 
 interface Props {
   result: ComicAnalysisResult;
-  onAddToCollection: (isGraded: boolean, grade: string) => void;
+  onAddToCollection: (isGraded: boolean, grade: string, value: number) => void;
   onNewSearch: () => void;
 }
 
@@ -57,9 +57,39 @@ const UNGRADED_CONDITIONS = [
   "Poor"
 ];
 
+const calculateGradedValue = (baseValue: number, selectedGrade: string): number => {
+  const gradeNumber = parseFloat(selectedGrade.split(' ')[0]);
+  const ratio = gradeNumber / 9.8; // Using 9.8 as baseline
+  return Math.round(baseValue * ratio);
+};
+
+const calculateUngradedValue = (baseValue: number, selectedCondition: string): number => {
+  const conditionValues: { [key: string]: number } = {
+    "Near Mint/Mint": 1,
+    "Near Mint": 0.9,
+    "Very Fine": 0.7,
+    "Fine": 0.5,
+    "Very Good": 0.3,
+    "Good": 0.2,
+    "Fair": 0.1,
+    "Poor": 0.05
+  };
+  return Math.round(baseValue * (conditionValues[selectedCondition] || 1));
+};
+
 export const ComicAnalysisResult = ({ result, onAddToCollection, onNewSearch }: Props) => {
   const [selectedGradedCondition, setSelectedGradedCondition] = useState("9.8 Near Mint/Mint");
   const [selectedUngradedCondition, setSelectedUngradedCondition] = useState("Near Mint");
+
+  const handleGradedAdd = () => {
+    const adjustedValue = calculateGradedValue(result.graded_value, selectedGradedCondition);
+    onAddToCollection(true, selectedGradedCondition, adjustedValue);
+  };
+
+  const handleUngradedAdd = () => {
+    const adjustedValue = calculateUngradedValue(result.ungraded_value, selectedUngradedCondition);
+    onAddToCollection(false, selectedUngradedCondition, adjustedValue);
+  };
 
   return (
     <div className="bg-secondary p-4 rounded-lg space-y-4">
@@ -94,14 +124,14 @@ export const ComicAnalysisResult = ({ result, onAddToCollection, onNewSearch }: 
               conditions={GRADED_CONDITIONS}
               selectedCondition={selectedGradedCondition}
               onConditionChange={setSelectedGradedCondition}
-              onAddToCollection={() => onAddToCollection(true, selectedGradedCondition)}
+              onAddToCollection={handleGradedAdd}
               label="Add Graded Copy"
             />
             <ConditionSelector
               conditions={UNGRADED_CONDITIONS}
               selectedCondition={selectedUngradedCondition}
               onConditionChange={setSelectedUngradedCondition}
-              onAddToCollection={() => onAddToCollection(false, selectedUngradedCondition)}
+              onAddToCollection={handleUngradedAdd}
               label="Add Ungraded Copy"
             />
           </div>
