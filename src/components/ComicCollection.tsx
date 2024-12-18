@@ -7,10 +7,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { DeleteComicButton } from "./DeleteComicButton";
+import { useRealtimeSubscription } from "@/utils/useRealtimeSubscription";
 
 interface Comic {
   id: string;
@@ -22,32 +21,6 @@ interface Comic {
 
 export const ComicCollection = () => {
   const [comics, setComics] = useState<Comic[]>([]);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    // Initial fetch of comics
-    fetchComics();
-
-    // Set up real-time subscription
-    const channel = supabase
-      .channel('schema-db-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'user_comics'
-        },
-        () => {
-          fetchComics();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
 
   const fetchComics = async () => {
     const { data: userComics, error } = await supabase
@@ -63,39 +36,12 @@ export const ComicCollection = () => {
     setComics(userComics);
   };
 
-  const handleDelete = async (comicId: string) => {
-    try {
-      const { error } = await supabase
-        .from('user_comics')
-        .delete()
-        .eq('id', comicId);
+  useRealtimeSubscription('user_comics', fetchComics);
 
-      if (error) {
-        console.error('Error deleting comic:', error);
-        toast({
-          title: "Error",
-          description: "Failed to delete comic from collection",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Wait for the deletion to be reflected in the database
-      await fetchComics();
-
-      toast({
-        title: "Success",
-        description: "Comic removed from collection",
-      });
-    } catch (error) {
-      console.error('Error:', error);
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred",
-        variant: "destructive",
-      });
-    }
-  };
+  // Initial fetch
+  useEffect(() => {
+    fetchComics();
+  }, []);
 
   return (
     <div className="overflow-x-auto">
@@ -124,14 +70,10 @@ export const ComicCollection = () => {
                 {new Date(comic.added_at).toLocaleDateString()}
               </TableCell>
               <TableCell>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleDelete(comic.id)}
-                  className="text-red-500 hover:text-red-700 hover:bg-red-100"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <DeleteComicButton 
+                  comicId={comic.id}
+                  onDelete={fetchComics}
+                />
               </TableCell>
             </TableRow>
           ))}

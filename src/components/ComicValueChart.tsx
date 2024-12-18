@@ -2,39 +2,46 @@ import { useEffect, useState } from "react";
 import { ChartContainer } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
+import { useRealtimeSubscription } from "@/utils/useRealtimeSubscription";
 
 interface MonthlyValue {
   month: string;
   value: number;
 }
 
+const processComicData = (comics: any[]) => {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const monthlyTotals = new Map<string, number>();
+  const currentYear = new Date().getFullYear();
+  
+  // Initialize all months with 0
+  months.forEach(month => {
+    monthlyTotals.set(month, 0);
+  });
+
+  // Calculate running total for each month
+  let runningTotal = 0;
+  comics?.forEach(comic => {
+    if (comic.estimated_value) {
+      const date = new Date(comic.added_at);
+      // Only process comics from the current year
+      if (date.getFullYear() === currentYear) {
+        const month = months[date.getMonth()];
+        runningTotal += Number(comic.estimated_value);
+        monthlyTotals.set(month, runningTotal);
+      }
+    }
+  });
+
+  // Convert to array format for Recharts
+  return months.map(month => ({
+    month,
+    value: monthlyTotals.get(month) || 0
+  }));
+};
+
 export const ComicValueChart = () => {
   const [monthlyData, setMonthlyData] = useState<MonthlyValue[]>([]);
-
-  useEffect(() => {
-    // Initial fetch
-    fetchAndProcessComicData();
-
-    // Set up real-time subscription
-    const channel = supabase
-      .channel('schema-db-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'user_comics'
-        },
-        () => {
-          fetchAndProcessComicData();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
 
   const fetchAndProcessComicData = async () => {
     const { data: comics, error } = await supabase
@@ -47,39 +54,15 @@ export const ComicValueChart = () => {
       return;
     }
 
-    // Process comics data into monthly totals
-    const monthlyTotals = new Map<string, number>();
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    
-    // Initialize all months with 0
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    months.forEach(month => {
-      monthlyTotals.set(month, 0);
-    });
-
-    // Calculate running total for each month
-    let runningTotal = 0;
-    comics?.forEach(comic => {
-      if (comic.estimated_value) {
-        const date = new Date(comic.added_at);
-        // Only process comics from the current year
-        if (date.getFullYear() === currentYear) {
-          const month = months[date.getMonth()];
-          runningTotal += Number(comic.estimated_value);
-          monthlyTotals.set(month, runningTotal);
-        }
-      }
-    });
-
-    // Convert to array format for Recharts
-    const chartData = months.map(month => ({
-      month,
-      value: monthlyTotals.get(month) || 0
-    }));
-
-    setMonthlyData(chartData);
+    setMonthlyData(processComicData(comics));
   };
+
+  useRealtimeSubscription('user_comics', fetchAndProcessComicData);
+
+  // Initial fetch
+  useEffect(() => {
+    fetchAndProcessComicData();
+  }, []);
 
   return (
     <ChartContainer
