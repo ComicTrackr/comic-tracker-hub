@@ -64,25 +64,37 @@ export const ComicCollection = () => {
   };
 
   const handleDelete = async (comicId: string) => {
-    const { error } = await supabase
-      .from('user_comics')
-      .delete()
-      .eq('id', comicId);
+    try {
+      const { error } = await supabase
+        .from('user_comics')
+        .delete()
+        .eq('id', comicId);
 
-    if (error) {
-      console.error('Error deleting comic:', error);
+      if (error) {
+        console.error('Error deleting comic:', error);
+        toast({
+          title: "Error",
+          description: "Failed to delete comic from collection",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Wait for the deletion to be reflected in the database
+      await fetchComics();
+
+      toast({
+        title: "Success",
+        description: "Comic removed from collection",
+      });
+    } catch (error) {
+      console.error('Error:', error);
       toast({
         title: "Error",
-        description: "Failed to delete comic from collection",
+        description: "An unexpected error occurred",
         variant: "destructive",
       });
-      return;
     }
-
-    toast({
-      title: "Success",
-      description: "Comic removed from collection",
-    });
   };
 
   return (
