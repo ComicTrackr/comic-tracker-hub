@@ -15,7 +15,7 @@ interface Comic {
 
 interface ComicTableRowProps {
   comic: Comic;
-  onDelete: () => void;
+  onDelete: () => Promise<void>;
 }
 
 export const ComicTableRow = ({ comic, onDelete }: ComicTableRowProps) => {
