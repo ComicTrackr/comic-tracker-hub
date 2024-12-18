@@ -27,20 +27,21 @@ serve(async (req) => {
 
       1. The exact title and issue number
       2. Current market values based ONLY on eBay completed sales from the last 30 days:
-         - For CGC 9.8 copies: Calculate the average price from the last 3-5 actual CGC 9.8 sales on eBay
+         - For CGC 9.8 copies: Calculate the average price from the last 3-5 actual CGC 9.8 sales on eBay. If no 9.8 sales exist, use 9.6 and add 20% to estimate 9.8 value
          - For ungraded Near Mint copies: Calculate the average price from the last 3-5 actual raw copy sales on eBay in NM condition
       3. Include specific eBay sale examples with dates and prices to justify your valuations
       
       IMPORTANT GUIDELINES:
       - Only use actual eBay completed sales from the last 30 days
-      - If there aren't enough recent sales in 9.8, use the next highest grade with sales data
+      - For CGC 9.8: If insufficient recent 9.8 sales exist, use next highest grade and add 20-30% premium
       - For raw copies, only consider listings that specifically mention Near Mint or NM condition
       - Exclude outlier prices that are significantly higher or lower than the average
+      - CGC 9.8 values should typically be 2-3x higher than raw NM copies
       - For modern comics (last 5 years), focus on the most recent sales as prices can fluctuate rapidly
       
       Format your response exactly like this:
       Title: [Comic Title and Issue Number]
-      GradedValue: [Average price of recent CGC 9.8 sales on eBay]
+      GradedValue: [Average price of recent CGC 9.8 sales on eBay, should be 2-3x higher than ungraded]
       UngradedValue: [Average price of recent NM raw copy sales on eBay]
       Analysis: [List specific recent eBay sales with dates and prices, followed by market trends and value justification]`
 
@@ -74,20 +75,21 @@ serve(async (req) => {
 
       1. The exact title and issue number
       2. Current market values based ONLY on eBay completed sales from the last 30 days:
-         - For CGC 9.8 copies: Calculate the average price from the last 3-5 actual CGC 9.8 sales on eBay
+         - For CGC 9.8 copies: Calculate the average price from the last 3-5 actual CGC 9.8 sales on eBay. If no 9.8 sales exist, use 9.6 and add 20% to estimate 9.8 value
          - For ungraded Near Mint copies: Calculate the average price from the last 3-5 actual raw copy sales on eBay in NM condition
       3. Include specific eBay sale examples with dates and prices to justify your valuations
       
       IMPORTANT GUIDELINES:
       - Only use actual eBay completed sales from the last 30 days
-      - If there aren't enough recent sales in 9.8, use the next highest grade with sales data
+      - For CGC 9.8: If insufficient recent 9.8 sales exist, use next highest grade and add 20-30% premium
       - For raw copies, only consider listings that specifically mention Near Mint or NM condition
       - Exclude outlier prices that are significantly higher or lower than the average
+      - CGC 9.8 values should typically be 2-3x higher than raw NM copies
       - For modern comics (last 5 years), focus on the most recent sales as prices can fluctuate rapidly
       
       Format your response exactly like this:
       Title: [Comic Title and Issue Number]
-      GradedValue: [Average price of recent CGC 9.8 sales on eBay]
+      GradedValue: [Average price of recent CGC 9.8 sales on eBay, should be 2-3x higher than ungraded]
       UngradedValue: [Average price of recent NM raw copy sales on eBay]
       Analysis: [List specific recent eBay sales with dates and prices, followed by market trends and value justification]`
 
@@ -113,9 +115,12 @@ serve(async (req) => {
       parseFloat(ungradedValueMatch[1].replace(/,/g, '')) : 
       0
 
+    // Ensure graded value is at least 2x the ungraded value
+    const finalGradedValue = Math.max(gradedValue, ungradedValue * 2);
+
     const analysis = {
       comic_title: titleMatch ? titleMatch[1].trim() : searchQuery,
-      graded_value: gradedValue,
+      graded_value: finalGradedValue,
       ungraded_value: ungradedValue,
       analysis_text: analysisMatch ? analysisMatch[1].trim() : text
     }
