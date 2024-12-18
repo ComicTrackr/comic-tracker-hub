@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { DeleteComicButton } from "./DeleteComicButton";
 import { useRealtimeSubscription } from "@/utils/useRealtimeSubscription";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Comic {
   id: string;
@@ -19,6 +20,7 @@ interface Comic {
   estimated_value: number | null;
   added_at: string;
   is_graded: boolean;
+  image_url: string | null;
 }
 
 export const ComicCollection = () => {
@@ -51,6 +53,7 @@ export const ComicCollection = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="text-orange-800 w-[80px] px-2 md:px-4">Cover</TableHead>
                 <TableHead className="text-orange-800 min-w-[140px] md:min-w-[200px] px-2 md:px-4">Title</TableHead>
                 <TableHead className="text-orange-800 min-w-[100px] px-2 md:px-4">Condition</TableHead>
                 <TableHead className="text-orange-800 min-w-[80px] px-2 md:px-4">Value</TableHead>
@@ -62,6 +65,18 @@ export const ComicCollection = () => {
             <TableBody>
               {comics.map((comic) => (
                 <TableRow key={comic.id}>
+                  <TableCell className="px-2 md:px-4">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage 
+                        src={comic.image_url || '/placeholder.svg'} 
+                        alt={comic.comic_title}
+                        className="object-cover"
+                      />
+                      <AvatarFallback>
+                        {comic.comic_title.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </TableCell>
                   <TableCell className="font-medium break-words px-2 md:px-4 text-sm md:text-base">
                     {comic.comic_title}
                   </TableCell>
