@@ -1,7 +1,6 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { DeleteComicButton } from "../DeleteComicButton";
-import { ComicCover } from "./ComicCover";
 
 interface Comic {
   id: string;
@@ -21,9 +20,6 @@ interface ComicTableRowProps {
 export const ComicTableRow = ({ comic, onDelete }: ComicTableRowProps) => {
   return (
     <TableRow key={comic.id}>
-      <TableCell className="px-2 md:px-4">
-        <ComicCover imageUrl={comic.image_url} title={comic.comic_title} />
-      </TableCell>
       <TableCell className="font-medium break-words px-2 md:px-4 text-sm md:text-base">
         {comic.comic_title}
       </TableCell>
