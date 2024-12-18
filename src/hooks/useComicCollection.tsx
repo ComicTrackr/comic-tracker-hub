@@ -21,6 +21,8 @@ export const useComicCollection = () => {
         return;
       }
 
+      console.log('Adding comic with image URL:', analysisResult.cover_image_url);
+
       const { error } = await supabase
         .from('user_comics')
         .insert({
