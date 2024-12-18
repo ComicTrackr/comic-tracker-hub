@@ -37,11 +37,12 @@ export const SearchBar = () => {
 
       if (error) throw error;
 
+      // Save the analysis to the database
       const { error: insertError } = await supabase
         .from('comic_analyses')
         .insert({
           user_id: user.id,
-          comic_title: searchQuery.trim(),
+          comic_title: analysis.comic_title,
           analysis_text: analysis.analysis_text,
           condition_rating: analysis.condition_rating,
           estimated_value: analysis.estimated_value
@@ -49,8 +50,9 @@ export const SearchBar = () => {
 
       if (insertError) throw insertError;
 
+      // Update the UI with the analysis result
       setAnalysisResult({
-        comic_title: searchQuery.trim(),
+        comic_title: analysis.comic_title,
         analysis_text: analysis.analysis_text,
         condition_rating: analysis.condition_rating,
         estimated_value: analysis.estimated_value
