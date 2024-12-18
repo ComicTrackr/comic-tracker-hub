@@ -66,6 +66,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_comics: {
+        Row: {
+          added_at: string
+          comic_title: string
+          condition_rating: string | null
+          estimated_value: number | null
+          id: string
+          image_url: string | null
+          user_id: string
+        }
+        Insert: {
+          added_at?: string
+          comic_title: string
+          condition_rating?: string | null
+          estimated_value?: number | null
+          id?: string
+          image_url?: string | null
+          user_id: string
+        }
+        Update: {
+          added_at?: string
+          comic_title?: string
+          condition_rating?: string | null
+          estimated_value?: number | null
+          id?: string
+          image_url?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
