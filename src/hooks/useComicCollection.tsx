@@ -7,7 +7,7 @@ export const useComicCollection = () => {
   const { toast } = useToast();
   const [analysisResult, setAnalysisResult] = useState<ComicAnalysisResult | null>(null);
 
-  const addToCollection = async (isGraded: boolean) => {
+  const addToCollection = async (isGraded: boolean, grade: string) => {
     if (!analysisResult) return;
 
     try {
@@ -27,7 +27,8 @@ export const useComicCollection = () => {
         .insert({
           user_id: user.id,
           comic_title: analysisResult.comic_title,
-          estimated_value: isGraded ? analysisResult.graded_value : analysisResult.ungraded_value
+          estimated_value: isGraded ? analysisResult.graded_value : analysisResult.ungraded_value,
+          condition_rating: grade
         });
 
       if (error) throw error;

@@ -37,7 +37,6 @@ export const SearchBar = () => {
 
       if (error) throw error;
 
-      // Update the UI with the analysis result
       setAnalysisResult({
         comic_title: analysis.comic_title,
         analysis_text: analysis.analysis_text,
