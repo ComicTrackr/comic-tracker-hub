@@ -24,7 +24,7 @@ serve(async (req) => {
   try {
     const { image, searchQuery } = await req.json()
     const genAI = new GoogleGenerativeAI(Deno.env.get('GEMINI_API_KEY'))
-    const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" })
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
 
     let prompt, result
 
