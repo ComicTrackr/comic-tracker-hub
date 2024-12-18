@@ -49,6 +49,7 @@ export const ComicCollection = () => {
         <TableHeader>
           <TableRow>
             <TableHead className="text-orange-800">Title</TableHead>
+            <TableHead className="text-orange-800">Condition</TableHead>
             <TableHead className="text-orange-800">Value</TableHead>
             <TableHead className="text-orange-800">Added</TableHead>
             <TableHead className="text-orange-800">Actions</TableHead>
@@ -58,6 +59,7 @@ export const ComicCollection = () => {
           {comics.map((comic) => (
             <TableRow key={comic.id}>
               <TableCell className="font-medium">{comic.comic_title}</TableCell>
+              <TableCell>{comic.condition_rating || 'N/A'}</TableCell>
               <TableCell>
                 {comic.estimated_value 
                   ? `$${comic.estimated_value.toLocaleString()}`
