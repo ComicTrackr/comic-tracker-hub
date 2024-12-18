@@ -6,21 +6,13 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-function processBase64Image(base64Image: string): Uint8Array {
+function processBase64Image(base64Image: string): string {
   // Remove data URL prefix if present
   const base64Data = base64Image.includes(',') ? 
     base64Image.split(',')[1] : 
     base64Image;
-
-  // Convert base64 to binary
-  const binaryStr = atob(base64Data);
-  const bytes = new Uint8Array(binaryStr.length);
   
-  for (let i = 0; i < binaryStr.length; i++) {
-    bytes[i] = binaryStr.charCodeAt(i);
-  }
-  
-  return bytes;
+  return base64Data;
 }
 
 serve(async (req) => {
@@ -51,25 +43,28 @@ serve(async (req) => {
 
       try {
         console.log('Processing image...');
-        const imageData = processBase64Image(image);
-        console.log('Image processed, size:', imageData.length, 'bytes');
-
+        const processedImage = processBase64Image(image);
+        
         result = await model.generateContent([
-          prompt,
           {
-            inlineData: {
-              mimeType: "image/jpeg",
-              data: imageData
-            }
+            parts: [
+              { text: prompt },
+              {
+                inlineData: {
+                  mimeType: "image/jpeg",
+                  data: processedImage
+                }
+              }
+            ]
           }
         ]);
+        
         console.log('Analysis completed successfully');
       } catch (imageError) {
         console.error('Error processing image:', imageError);
         throw new Error('Failed to process image: ' + imageError.message);
       }
     } else if (searchQuery) {
-      // Text-based search
       prompt = `You are a comic book expert and appraiser. For the comic "${searchQuery}", provide:
       1. The exact title of the comic book
       2. A condition rating on a scale of 1-10 (assume near mint condition)
