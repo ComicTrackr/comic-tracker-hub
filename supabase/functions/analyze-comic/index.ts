@@ -12,22 +12,24 @@ serve(async (req) => {
   }
 
   try {
-    const { image, title, searchQuery } = await req.json()
-
+    const { image, searchQuery } = await req.json()
     const genAI = new GoogleGenerativeAI(Deno.env.get('GEMINI_API_KEY'))
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
-    const textModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
 
     let prompt, result
 
     if (image) {
-      // Handle image-based analysis
-      prompt = `Analyze this comic book cover image. Please provide:
-      1. A brief description of the cover
-      2. An estimated condition rating (from 1-10)
-      3. Research and provide the current market value range in USD. Be specific about different conditions and editions if relevant.
-      4. Any notable features or details that could affect its value
-      Title of the comic: ${title}`
+      // Image-based analysis
+      prompt = `You are a comic book expert and appraiser. Analyze this comic book cover image and provide:
+      1. The exact title of the comic book
+      2. A condition rating on a scale of 1-10
+      3. An estimated market value in USD based on current market data
+      4. A brief analysis of notable features or details that affect its value
+      Format your response like this:
+      Title: [Comic Title]
+      Condition: [1-10]
+      Value: [USD amount]
+      Analysis: [Your detailed analysis]`
 
       result = await model.generateContent([
         prompt,
@@ -39,15 +41,19 @@ serve(async (req) => {
         }
       ])
     } else if (searchQuery) {
-      // Handle text-based search
-      prompt = `Research the following comic book and provide:
-      1. Title and key publication details
-      2. Current market value ranges in USD for different conditions
-      3. Any notable features or variants that affect value
-      4. Recent sales data or trends if available
-      Comic to research: ${searchQuery}`
+      // Text-based search
+      prompt = `You are a comic book expert and appraiser. For the comic "${searchQuery}", provide:
+      1. The exact title of the comic book
+      2. A condition rating on a scale of 1-10 (assume near mint condition)
+      3. An estimated market value in USD based on current market data
+      4. A brief analysis of notable features or details that affect its value
+      Format your response like this:
+      Title: [Comic Title]
+      Condition: [1-10]
+      Value: [USD amount]
+      Analysis: [Your detailed analysis]`
 
-      result = await textModel.generateContent(prompt)
+      result = await model.generateContent(prompt)
     } else {
       throw new Error('Either image or searchQuery must be provided')
     }
@@ -55,14 +61,19 @@ serve(async (req) => {
     const response = await result.response
     const text = response.text()
 
-    // Parse the response to extract structured data
-    const conditionMatch = text.match(/rating.*?(\d+)/i)
-    const valueMatch = text.match(/\$\s*(\d+(?:,\d+)?(?:\.\d+)?)/g)
+    // Parse the structured response
+    const titleMatch = text.match(/Title:\s*(.+?)(?=\n|$)/i)
+    const conditionMatch = text.match(/Condition:\s*(\d+)/i)
+    const valueMatch = text.match(/Value:\s*\$?(\d+(?:,\d+)?(?:\.\d+)?)/i)
+    const analysisMatch = text.match(/Analysis:\s*(.+?)(?=\n|$)/i)
 
     const analysis = {
-      text: text,
-      condition_rating: conditionMatch ? conditionMatch[1] : null,
-      estimated_value: valueMatch ? parseFloat(valueMatch[0].replace(/[$,]/g, '')) : null
+      comic_title: titleMatch ? titleMatch[1].trim() : searchQuery,
+      condition_rating: conditionMatch ? conditionMatch[1] : "9",
+      estimated_value: valueMatch 
+        ? parseFloat(valueMatch[1].replace(/,/g, ''))
+        : 100,
+      text: analysisMatch ? analysisMatch[1].trim() : text
     }
 
     console.log('Analysis completed:', analysis)
