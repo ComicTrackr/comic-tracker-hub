@@ -52,7 +52,7 @@ serve(async (req) => {
       try {
         console.log('Processing image...');
         const imageData = processBase64Image(image);
-        console.log('Image processed, size:', imageData.length);
+        console.log('Image processed, size:', imageData.length, 'bytes');
 
         result = await model.generateContent([
           prompt,

@@ -10,6 +10,47 @@ export interface ComicAnalysisResult {
   estimated_value: number;
 }
 
+const compressImage = async (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        // Convert to JPEG with 0.8 quality
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+        resolve(compressedBase64);
+      };
+      img.onerror = reject;
+    };
+    reader.onerror = reject;
+  });
+};
+
 export const useComicUpload = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { toast } = useToast();
@@ -18,12 +59,9 @@ export const useComicUpload = () => {
     try {
       setIsAnalyzing(true);
       
-      // Convert file to base64
-      const base64 = await new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.readAsDataURL(file);
-      });
+      // Compress the image before sending
+      const compressedBase64 = await compressImage(file);
+      console.log('Compressed image size:', Math.round(compressedBase64.length / 1024), 'KB');
 
       // Check authentication
       const { data: { user } } = await supabase.auth.getUser();
@@ -41,11 +79,11 @@ export const useComicUpload = () => {
         description: "Please wait while we analyze your comic cover",
       });
 
-      // Analyze the comic
-      const analysis = await analyzeComicImage(base64);
+      // Analyze the comic with compressed image
+      const analysis = await analyzeComicImage(compressedBase64);
       
       // Save the analysis
-      await saveComicAnalysis(user.id, analysis, base64);
+      await saveComicAnalysis(user.id, analysis, compressedBase64);
 
       toast({
         title: "Analysis Complete",
@@ -54,7 +92,7 @@ export const useComicUpload = () => {
 
       return analysis;
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error:', error);
       toast({
         title: "Analysis Failed",
