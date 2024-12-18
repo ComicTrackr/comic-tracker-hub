@@ -1,11 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-
-interface ComicAnalysisResult {
-  comic_title: string;
-  analysis_text: string;
-  condition_rating: string;
-  estimated_value: number;
-}
+import { ComicAnalysisResult } from "@/components/ComicAnalysisResult";
 
 export const analyzeComicImage = async (base64Image: string): Promise<ComicAnalysisResult> => {
   const { data: analysis, error } = await supabase.functions.invoke('analyze-comic', {
@@ -26,7 +20,7 @@ export const saveComicAnalysis = async (
     .insert({
       user_id: userId,
       comic_title: analysis.comic_title,
-      analysis_text: analysis.text,
+      analysis_text: analysis.analysis_text, // Changed from analysis.text to analysis.analysis_text
       condition_rating: analysis.condition_rating,
       estimated_value: analysis.estimated_value,
       image_url: imageUrl
