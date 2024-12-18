@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface ComicCoverProps {
@@ -8,15 +8,27 @@ interface ComicCoverProps {
 
 export const ComicCover = ({ imageUrl, title }: ComicCoverProps) => {
   const [imageError, setImageError] = useState(false);
+  const [displayUrl, setDisplayUrl] = useState<string>("/placeholder.svg");
   const fallbackImageUrl = "/placeholder.svg";
 
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.error('Image load error for:', title, 'URL:', imageUrl);
-    setImageError(true);
-    e.currentTarget.src = fallbackImageUrl;
-  };
+  useEffect(() => {
+    console.log('ComicCover received imageUrl:', imageUrl);
+    if (imageUrl) {
+      setDisplayUrl(imageUrl);
+      setImageError(false);
+    } else {
+      console.log('No image URL provided, using fallback');
+      setDisplayUrl(fallbackImageUrl);
+    }
+  }, [imageUrl]);
 
-  const displayUrl = imageUrl && !imageError ? imageUrl : fallbackImageUrl;
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    console.error('Image load error for:', title);
+    console.error('Failed URL:', imageUrl);
+    console.error('Error event:', e);
+    setImageError(true);
+    setDisplayUrl(fallbackImageUrl);
+  };
 
   return (
     <Avatar className="h-12 w-12">

@@ -38,10 +38,7 @@ export const SearchBar = () => {
       if (error) throw error;
 
       console.log('Analysis response:', analysis);
-
-      if (!analysis.cover_image_url) {
-        console.warn('No cover image URL provided in analysis');
-      }
+      console.log('Cover image URL from analysis:', analysis.cover_image_url);
 
       setAnalysisResult({
         comic_title: analysis.comic_title,

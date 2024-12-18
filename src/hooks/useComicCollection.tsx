@@ -21,7 +21,11 @@ export const useComicCollection = () => {
         return;
       }
 
-      console.log('Adding comic with image URL:', analysisResult.cover_image_url);
+      console.log('Adding comic with following details:');
+      console.log('Title:', analysisResult.comic_title);
+      console.log('Image URL:', analysisResult.cover_image_url);
+      console.log('Grade:', grade);
+      console.log('Value:', adjustedValue);
 
       const { error } = await supabase
         .from('user_comics')
@@ -44,7 +48,7 @@ export const useComicCollection = () => {
       setAnalysisResult(null);
 
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error adding comic to collection:', error);
       toast({
         title: "Error",
         description: "Failed to add comic to collection",
