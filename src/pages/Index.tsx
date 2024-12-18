@@ -1,6 +1,5 @@
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
-import { SearchBar } from "@/components/SearchBar";
 import { UploadButton } from "@/components/UploadButton";
 
 const Index = () => {
@@ -13,8 +12,6 @@ const Index = () => {
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="flex flex-col items-center space-y-6">
             <UploadButton />
-            <p className="text-sm opacity-70">or</p>
-            <SearchBar />
           </div>
           
           <div className="text-center">
