@@ -6,6 +6,43 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+async function resizeImage(base64Image: string): Promise<Uint8Array> {
+  // Create an image element
+  const img = new Image()
+  img.src = base64Image
+  
+  await new Promise((resolve) => {
+    img.onload = resolve
+  })
+
+  // Create a canvas and get its context
+  const canvas = new OffscreenCanvas(800, 800)
+  const ctx = canvas.getContext('2d')
+
+  // Calculate new dimensions maintaining aspect ratio
+  let width = img.width
+  let height = img.height
+  const maxDimension = 800
+
+  if (width > height && width > maxDimension) {
+    height = (height * maxDimension) / width
+    width = maxDimension
+  } else if (height > maxDimension) {
+    width = (width * maxDimension) / height
+    height = maxDimension
+  }
+
+  // Set canvas dimensions and draw resized image
+  canvas.width = width
+  canvas.height = height
+  ctx.drawImage(img, 0, 0, width, height)
+
+  // Convert to blob and then to Uint8Array
+  const blob = await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.8 })
+  const arrayBuffer = await blob.arrayBuffer()
+  return new Uint8Array(arrayBuffer)
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -32,18 +69,24 @@ serve(async (req) => {
       Value: [USD amount]
       Analysis: [Your detailed analysis]`
 
-      // Convert base64 to Uint8Array for Gemini
-      const imageData = Uint8Array.from(atob(image.split(',')[1]), c => c.charCodeAt(0))
+      try {
+        // Resize the image before processing
+        const resizedImageData = await resizeImage(image)
+        console.log('Image resized successfully, size:', resizedImageData.length)
 
-      result = await model.generateContent([
-        prompt,
-        {
-          inlineData: {
-            mimeType: "image/jpeg",
-            data: imageData
+        result = await model.generateContent([
+          prompt,
+          {
+            inlineData: {
+              mimeType: "image/jpeg",
+              data: resizedImageData
+            }
           }
-        }
-      ])
+        ])
+      } catch (imageError) {
+        console.error('Error processing image:', imageError)
+        throw new Error('Failed to process image: ' + imageError.message)
+      }
     } else if (searchQuery) {
       // Text-based search
       prompt = `You are a comic book expert and appraiser. For the comic "${searchQuery}", provide:
