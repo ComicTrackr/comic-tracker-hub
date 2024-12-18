@@ -39,8 +39,7 @@ export const UploadButton = () => {
 
       const { data: analysis, error } = await supabase.functions.invoke('analyze-comic', {
         body: {
-          image: base64,
-          title: file.name.replace(/\.[^/.]+$/, "")
+          image: base64
         }
       });
 
@@ -50,7 +49,7 @@ export const UploadButton = () => {
         .from('comic_analyses')
         .insert({
           user_id: user.id,
-          comic_title: file.name.replace(/\.[^/.]+$/, ""),
+          comic_title: analysis.comic_title,
           analysis_text: analysis.text,
           condition_rating: analysis.condition_rating,
           estimated_value: analysis.estimated_value,
@@ -60,7 +59,7 @@ export const UploadButton = () => {
       if (insertError) throw insertError;
 
       setAnalysisResult({
-        comic_title: file.name.replace(/\.[^/.]+$/, ""),
+        comic_title: analysis.comic_title,
         analysis_text: analysis.text,
         condition_rating: analysis.condition_rating,
         estimated_value: analysis.estimated_value
