@@ -12,17 +12,24 @@ import "./App.css";
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   useEffect(() => {
-    // Initialize auth state
     const initializeAuth = async () => {
       try {
-        // Get initial session
         const { data: { session: initialSession } } = await supabase.auth.getSession();
         setSession(initialSession);
+
+        if (initialSession) {
+          // Check subscription status
+          const { data, error } = await supabase.functions.invoke('is-subscribed');
+          if (error) throw error;
+          setIsSubscribed(data.subscribed);
+        }
       } catch (error) {
-        console.error("Error getting session:", error);
+        console.error("Error:", error);
         setSession(null);
+        setIsSubscribed(false);
       } finally {
         setLoading(false);
       }
@@ -30,16 +37,24 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
     initializeAuth();
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
+      if (session) {
+        try {
+          const { data, error } = await supabase.functions.invoke('is-subscribed');
+          if (error) throw error;
+          setIsSubscribed(data.subscribed);
+        } catch (error) {
+          console.error("Error checking subscription:", error);
+          setIsSubscribed(false);
+        }
+      }
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  // Show loading state
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -53,6 +68,11 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/login" replace />;
   }
 
+  // Redirect to membership if not subscribed
+  if (!isSubscribed) {
+    return <Navigate to="/membership" replace />;
+  }
+
   return <>{children}</>;
 };
 
@@ -61,10 +81,10 @@ function App() {
     <Router>
       <div className="min-h-screen bg-background">
         <Routes>
-          {/* Redirect root to login */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/login" element={<Login />} />
+          {/* Redirect root to membership */}
+          <Route path="/" element={<Navigate to="/membership" replace />} />
           <Route path="/membership" element={<Membership />} />
+          <Route path="/login" element={<Login />} />
           <Route
             path="/dashboard"
             element={

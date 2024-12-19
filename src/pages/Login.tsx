@@ -34,8 +34,6 @@ const Login = () => {
           
           if (data?.url) {
             window.location.href = data.url;
-          } else {
-            navigate("/landing");
           }
         } catch (error) {
           console.error('Payment error:', error);
@@ -46,7 +44,20 @@ const Login = () => {
           });
         }
       } else if (session) {
-        navigate("/landing");
+        // Check if user is subscribed
+        try {
+          const { data, error } = await supabase.functions.invoke('is-subscribed');
+          if (error) throw error;
+          
+          if (data.subscribed) {
+            navigate("/landing");
+          } else {
+            navigate("/membership");
+          }
+        } catch (error) {
+          console.error("Error checking subscription:", error);
+          navigate("/membership");
+        }
       }
     };
 
@@ -71,8 +82,6 @@ const Login = () => {
           
           if (data?.url) {
             window.location.href = data.url;
-          } else {
-            navigate("/landing");
           }
         } catch (error) {
           console.error('Payment error:', error);
@@ -83,7 +92,20 @@ const Login = () => {
           });
         }
       } else if (session) {
-        navigate("/landing");
+        // Check if user is subscribed
+        try {
+          const { data, error } = await supabase.functions.invoke('is-subscribed');
+          if (error) throw error;
+          
+          if (data.subscribed) {
+            navigate("/landing");
+          } else {
+            navigate("/membership");
+          }
+        } catch (error) {
+          console.error("Error checking subscription:", error);
+          navigate("/membership");
+        }
       }
     });
 
