@@ -14,7 +14,7 @@ function App() {
       <Router>
         <div className="min-h-screen bg-background">
           <Routes>
-            {/* Redirect root to membership page */}
+            {/* Landing page is Membership */}
             <Route path="/" element={<Membership />} />
             <Route path="/login" element={<Login />} />
             <Route 
@@ -33,7 +33,7 @@ function App() {
                 </ProtectedRoute>
               } 
             />
-            {/* Catch all route - redirect to membership */}
+            {/* Catch all route - redirect to landing */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           <Toaster />

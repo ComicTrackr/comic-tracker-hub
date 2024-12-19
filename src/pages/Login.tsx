@@ -50,13 +50,13 @@ const Login = () => {
           if (error) throw error;
           
           if (data.subscribed) {
-            navigate("/index");
+            navigate("/search");
           } else {
-            navigate("/membership");
+            navigate("/");
           }
         } catch (error) {
           console.error("Error checking subscription:", error);
-          navigate("/membership");
+          navigate("/");
         }
       }
     };
@@ -98,13 +98,13 @@ const Login = () => {
           if (error) throw error;
           
           if (data.subscribed) {
-            navigate("/index");
+            navigate("/search");
           } else {
-            navigate("/membership");
+            navigate("/");
           }
         } catch (error) {
           console.error("Error checking subscription:", error);
-          navigate("/membership");
+          navigate("/");
         }
       }
     });
@@ -136,7 +136,7 @@ const Login = () => {
               }
             }}
             providers={[]}
-            redirectTo={`${window.location.origin}/index`}
+            redirectTo={`${window.location.origin}/search`}
           />
         </Card>
       </div>
