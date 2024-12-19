@@ -85,7 +85,10 @@ const Login = () => {
       <Navbar />
       <div className="pt-24 px-4 flex items-center justify-center">
         <Card className="w-full max-w-md p-8">
-          <h1 className="text-2xl font-bold text-orange-800 mb-8 text-center">Welcome to ComicTrackr</h1>
+          <h1 className="text-2xl font-bold text-orange-800 mb-2 text-center">Welcome to ComicTrackr</h1>
+          <p className="text-sm text-muted-foreground mb-6 text-center">
+            AI Powered Real-Time Retail Value For Your Comic Collection
+          </p>
           <Auth
             supabaseClient={supabase}
             appearance={{
