@@ -14,13 +14,28 @@ function App() {
       <Router>
         <div className="min-h-screen bg-background">
           <Routes>
-            <Route path="/" element={<Navigate to="/landing" replace />} />
-            <Route path="/login" element={<Login />} />
+            {/* Redirect root to membership page */}
+            <Route path="/" element={<Navigate to="/membership" replace />} />
             <Route path="/membership" element={<Membership />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/landing" element={<Index />} />
-            {/* Catch all route - redirect to landing */}
-            <Route path="*" element={<Navigate to="/landing" replace />} />
+            <Route path="/login" element={<Login />} />
+            <Route 
+              path="/index" 
+              element={
+                <ProtectedRoute>
+                  <Index />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/dashboard" 
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            {/* Catch all route - redirect to membership */}
+            <Route path="*" element={<Navigate to="/membership" replace />} />
           </Routes>
           <Toaster />
         </div>

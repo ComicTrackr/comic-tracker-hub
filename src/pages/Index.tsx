@@ -8,14 +8,13 @@ import { Loader2 } from "lucide-react";
 const Index = () => {
   const { session, isLoading, isSubscribed } = useAuth();
   
-  console.log("Landing page - Auth State:", {
+  console.log("Index page - Auth State:", {
     isLoading,
     hasSession: !!session,
     isSubscribed,
     sessionDetails: session
   });
 
-  // Only show loading state for a brief period
   if (isLoading && !session) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
@@ -23,12 +22,6 @@ const Index = () => {
         <p className="text-muted-foreground">Loading your session...</p>
       </div>
     );
-  }
-
-  // Redirect to login if no session
-  if (!session) {
-    console.log("No session found, redirecting to login");
-    return <Navigate to="/login" replace />;
   }
 
   // Redirect to membership if not subscribed
