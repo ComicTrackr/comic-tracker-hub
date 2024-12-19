@@ -25,11 +25,11 @@ serve(async (req) => {
     
     if (planType === 'monthly') {
       // Monthly subscription at $4.99
-      priceId = 'price_1OxAZyD3P88qATRFGBPPGVxm'
+      priceId = 'price_1QXhE2D3P88qATRFGLkOcXUr'
       mode = 'subscription'
     } else {
       // One-time payment at $14.99
-      priceId = 'price_1OxAaLD3P88qATRFHgxPWnXB'
+      priceId = 'price_1QXhFND3P88qATRFiLqHHKD8'
       mode = 'payment'
     }
 
