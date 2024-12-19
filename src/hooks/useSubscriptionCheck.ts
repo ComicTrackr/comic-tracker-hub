@@ -7,11 +7,13 @@ export const useSubscriptionCheck = () => {
 
   const checkSubscription = async (userSession: Session | null) => {
     if (!userSession) {
+      console.log("No session provided for subscription check");
       setIsSubscribed(false);
       return;
     }
 
     try {
+      console.log("Checking subscription for user:", userSession.user.id);
       const { data, error } = await supabase.functions.invoke('is-subscribed', {
         body: { user_id: userSession.user.id }
       });

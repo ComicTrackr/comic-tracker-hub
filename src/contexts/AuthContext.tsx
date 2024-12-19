@@ -15,6 +15,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { isSubscribed, setIsSubscribed, checkSubscription } = useSubscriptionCheck();
   
   const handleSessionChange = useCallback(async (newSession: Session | null) => {
+    console.log("Session change detected:", newSession ? "Session exists" : "No session");
     if (newSession) {
       await checkSubscription(newSession);
     } else {
@@ -23,6 +24,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [checkSubscription, setIsSubscribed]);
 
   const { session, isLoading } = useSessionManager(handleSessionChange);
+
+  console.log("AuthProvider state:", { isLoading, hasSession: !!session, isSubscribed });
 
   return (
     <AuthContext.Provider value={{ session, isLoading, isSubscribed }}>

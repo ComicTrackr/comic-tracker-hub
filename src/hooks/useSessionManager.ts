@@ -20,7 +20,7 @@ export const useSessionManager = (onSessionChange: (session: Session | null) => 
 
         if (initialSession) {
           setSession(initialSession);
-          onSessionChange(initialSession);
+          await onSessionChange(initialSession);
         }
       } catch (error) {
         console.error("Auth initialization error:", error);
@@ -44,7 +44,7 @@ export const useSessionManager = (onSessionChange: (session: Session | null) => 
       if (!mounted) return;
 
       setSession(newSession);
-      onSessionChange(newSession);
+      await onSessionChange(newSession);
       setIsLoading(false);
     });
 

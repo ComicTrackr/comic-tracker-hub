@@ -8,7 +8,8 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   console.log("ProtectedRoute - Auth State:", {
     isLoading,
     hasSession: !!session,
-    isSubscribed
+    isSubscribed,
+    sessionDetails: session
   });
 
   if (isLoading) {
