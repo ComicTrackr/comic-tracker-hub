@@ -8,7 +8,6 @@ import { Loader2 } from "lucide-react";
 const Index = () => {
   const { session, isLoading, isSubscribed } = useAuth();
   
-  // Enhanced logging for debugging
   console.log("Landing page - Auth State:", {
     isLoading,
     hasSession: !!session,
@@ -16,8 +15,8 @@ const Index = () => {
     sessionDetails: session
   });
 
-  // Show loading state while checking authentication
-  if (isLoading) {
+  // Only show loading state for a brief period
+  if (isLoading && !session) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
