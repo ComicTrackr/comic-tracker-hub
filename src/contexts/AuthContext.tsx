@@ -24,43 +24,55 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const { data, error } = await supabase.functions.invoke('is-subscribed');
-      if (error) throw error;
-      setIsSubscribed(data.subscribed);
-      console.log("Subscription status:", data.subscribed);
+      // Add delay to prevent rate limiting
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const { data, error } = await supabase.functions.invoke('is-subscribed', {
+        body: { user_id: userSession.user.id }
+      });
+      
+      if (error) {
+        console.error("Subscription check error:", error);
+        // Don't update subscription status on error
+        return;
+      }
+      
+      setIsSubscribed(!!data?.subscribed);
+      console.log("Subscription status updated:", data?.subscribed);
     } catch (error) {
       console.error("Error checking subscription:", error);
-      // Don't set isSubscribed to false on error to prevent unnecessary redirects
-      toast({
-        variant: "destructive",
-        title: "Subscription Check Failed",
-        description: "Please try refreshing the page",
-      });
+      // Don't update subscription status on error
     }
   };
 
   useEffect(() => {
     let mounted = true;
+    let retryCount = 0;
+    const maxRetries = 3;
 
     const initializeAuth = async () => {
       try {
         const { data: { session: initialSession } } = await supabase.auth.getSession();
         console.log("Initial auth check - Session:", initialSession ? "Found" : "None");
         
-        if (mounted) {
-          setSession(initialSession);
+        if (!mounted) return;
+
+        setSession(initialSession);
+        
+        if (initialSession) {
           await checkSubscription(initialSession);
         }
       } catch (error) {
         console.error("Auth initialization error:", error);
-        if (mounted) {
+        if (mounted && retryCount < maxRetries) {
+          retryCount++;
+          setTimeout(initializeAuth, 1000 * retryCount);
+        } else if (mounted) {
           toast({
             variant: "destructive",
             title: "Authentication Error",
-            description: "Please try logging in again",
+            description: "Please try refreshing the page",
           });
-          setSession(null);
-          setIsSubscribed(false);
         }
       } finally {
         if (mounted) {
@@ -72,13 +84,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initializeAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event);
+      console.log("Auth state changed:", event, "Session:", session ? "Present" : "None");
       
-      if (mounted) {
-        setSession(session);
+      if (!mounted) return;
+
+      setSession(session);
+      
+      if (session) {
         await checkSubscription(session);
-        setIsLoading(false);
+      } else {
+        setIsSubscribed(false);
       }
+      
+      setIsLoading(false);
     });
 
     return () => {
