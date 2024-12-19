@@ -1,35 +1,28 @@
-import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useCallback } from "react";
 import { Session } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useSubscriptionCheck = () => {
   const [isSubscribed, setIsSubscribed] = useState(false);
 
-  const checkSubscription = async (userSession: Session | null) => {
-    if (!userSession) {
-      console.log("Subscription check: No session provided");
-      setIsSubscribed(false);
-      return;
-    }
-
+  const checkSubscription = useCallback(async (session: Session) => {
     try {
-      console.log("Subscription check: Checking status for user", userSession.user.id);
-      const { data, error } = await supabase.functions.invoke('is-subscribed', {
-        body: { user_id: userSession.user.id }
-      });
+      console.log("Subscription check: Checking status for user", session.user.id);
+      const { data, error } = await supabase.functions.invoke('is-subscribed');
       
       if (error) {
-        console.error("Subscription check failed:", error);
+        console.error("Subscription check error:", error);
+        setIsSubscribed(false);
         return;
       }
-      
-      const hasSubscription = !!data?.subscribed;
-      console.log("Subscription check result:", hasSubscription ? "Active" : "Inactive");
-      setIsSubscribed(hasSubscription);
+
+      console.log("Subscription check result:", data);
+      setIsSubscribed(data?.isSubscribed ?? false);
     } catch (error) {
-      console.error("Subscription check error:", error);
+      console.error("Subscription check failed:", error);
+      setIsSubscribed(false);
     }
-  };
+  }, []);
 
   return { isSubscribed, setIsSubscribed, checkSubscription };
 };
