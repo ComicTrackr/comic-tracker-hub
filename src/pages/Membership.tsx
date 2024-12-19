@@ -6,6 +6,10 @@ import { Navbar } from "@/components/Navbar";
 const Membership = () => {
   const navigate = useNavigate();
 
+  const handlePlanSelection = (planType: 'monthly' | 'lifetime') => {
+    navigate(`/login?plan=${planType}`);
+  };
+
   return (
     <>
       <Navbar />
@@ -74,7 +78,7 @@ const Membership = () => {
                 AI-Powered Analytics
               </li>
             </ul>
-            <Button onClick={() => navigate("/login")} className="w-full">
+            <Button onClick={() => handlePlanSelection('monthly')} className="w-full">
               Start Monthly Plan
             </Button>
           </Card>
@@ -99,7 +103,7 @@ const Membership = () => {
                 No Monthly Fees Ever
               </li>
             </ul>
-            <Button onClick={() => navigate("/login")} className="w-full">
+            <Button onClick={() => handlePlanSelection('lifetime')} className="w-full">
               Get Lifetime Access
             </Button>
           </Card>

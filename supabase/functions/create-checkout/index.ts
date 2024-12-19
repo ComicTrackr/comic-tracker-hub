@@ -17,15 +17,31 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     })
 
+    // Get the plan type from the request
+    const { planType } = await req.json()
+    
+    let priceId
+    let mode: 'payment' | 'subscription'
+    
+    if (planType === 'monthly') {
+      // Monthly subscription at $4.99
+      priceId = 'price_1OxAZyD3P88qATRFGBPPGVxm'
+      mode = 'subscription'
+    } else {
+      // One-time payment at $14.99
+      priceId = 'price_1OxAaLD3P88qATRFHgxPWnXB'
+      mode = 'payment'
+    }
+
     console.log('Creating payment session...')
     const session = await stripe.checkout.sessions.create({
       line_items: [
         {
-          price: 'price_1QXQReD3P88qATRFCDdWiGtc',
+          price: priceId,
           quantity: 1,
         },
       ],
-      mode: 'payment',
+      mode: mode,
       success_url: `${req.headers.get('origin')}/`,
       cancel_url: `${req.headers.get('origin')}/`,
     })

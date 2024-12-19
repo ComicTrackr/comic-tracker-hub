@@ -2,21 +2,25 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Navbar } from "@/components/Navbar";
 import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
+  const planType = new URLSearchParams(location.search).get('plan');
 
   useEffect(() => {
     const checkAuthAndRedirect = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
+      if (session && planType) {
         try {
-          const { data, error } = await supabase.functions.invoke('create-checkout');
+          const { data, error } = await supabase.functions.invoke('create-checkout', {
+            body: { planType }
+          });
           
           if (error) {
             console.error('Checkout error:', error);
@@ -41,15 +45,19 @@ const Login = () => {
             variant: "destructive",
           });
         }
+      } else if (session) {
+        navigate("/landing");
       }
     };
 
     checkAuthAndRedirect();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session) {
+      if (session && planType) {
         try {
-          const { data, error } = await supabase.functions.invoke('create-checkout');
+          const { data, error } = await supabase.functions.invoke('create-checkout', {
+            body: { planType }
+          });
           
           if (error) {
             console.error('Checkout error:', error);
@@ -74,11 +82,13 @@ const Login = () => {
             variant: "destructive",
           });
         }
+      } else if (session) {
+        navigate("/landing");
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, toast]);
+  }, [navigate, toast, planType]);
 
   return (
     <div className="min-h-screen bg-background">
