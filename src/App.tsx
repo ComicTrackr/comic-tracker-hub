@@ -7,27 +7,40 @@ import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
 import Membership from "@/pages/Membership";
 import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast";
 import "./App.css";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const initializeAuth = async () => {
       try {
+        console.log("Initializing auth...");
         const { data: { session: initialSession } } = await supabase.auth.getSession();
+        console.log("Initial session:", initialSession ? "Found" : "None");
         setSession(initialSession);
 
         if (initialSession) {
-          // Check subscription status
+          console.log("Checking subscription status...");
           const { data, error } = await supabase.functions.invoke('is-subscribed');
-          if (error) throw error;
+          if (error) {
+            console.error("Subscription check error:", error);
+            throw error;
+          }
+          console.log("Subscription status:", data.subscribed);
           setIsSubscribed(data.subscribed);
         }
       } catch (error) {
-        console.error("Error:", error);
+        console.error("Auth initialization error:", error);
+        toast({
+          variant: "destructive",
+          title: "Authentication Error",
+          description: "Please try logging in again.",
+        });
         setSession(null);
         setIsSubscribed(false);
       } finally {
@@ -38,6 +51,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     initializeAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      console.log("Auth state changed:", _event);
       setSession(session);
       if (session) {
         try {
@@ -63,13 +77,13 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  // Redirect to login if not authenticated
   if (!session) {
+    console.log("No session, redirecting to login");
     return <Navigate to="/login" replace />;
   }
 
-  // Redirect to membership if not subscribed
   if (!isSubscribed) {
+    console.log("Not subscribed, redirecting to membership");
     return <Navigate to="/membership" replace />;
   }
 
@@ -81,8 +95,7 @@ function App() {
     <Router>
       <div className="min-h-screen bg-background">
         <Routes>
-          {/* Redirect root to membership */}
-          <Route path="/" element={<Navigate to="/membership" replace />} />
+          <Route path="/" element={<Navigate to="/landing" replace />} />
           <Route path="/membership" element={<Membership />} />
           <Route path="/login" element={<Login />} />
           <Route
@@ -93,7 +106,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-          {/* Protected landing page */}
           <Route
             path="/landing"
             element={
