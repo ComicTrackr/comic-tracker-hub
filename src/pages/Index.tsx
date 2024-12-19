@@ -1,30 +1,11 @@
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { UploadButton } from "@/components/UploadButton";
-import { useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
-  const { toast } = useToast();
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        console.log("User authenticated on landing page");
-      } else {
-        console.log("No session on landing page");
-        toast({
-          variant: "destructive",
-          title: "Authentication Required",
-          description: "Please log in to access this page.",
-        });
-      }
-    };
-
-    checkAuth();
-  }, []);
+  const { session } = useAuth();
+  console.log("Landing page session status:", session ? "Authenticated" : "Not authenticated");
 
   return (
     <>
