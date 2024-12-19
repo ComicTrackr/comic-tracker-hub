@@ -39,7 +39,7 @@ export const useSessionManager = (onSessionChange: (session: Session | null) => 
     initializeAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
-      console.log("Auth state changed:", event, "Session:", newSession ? "Present" : "None");
+      console.log("Auth state change:", event, newSession ? "Present" : "None");
       
       if (!mounted) return;
 

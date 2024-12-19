@@ -28,7 +28,7 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   if (!isSubscribed) {
     console.log("Not subscribed, redirecting to membership");
-    return <Navigate to="/membership" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;
