@@ -37,7 +37,7 @@ const Membership = () => {
           <div className="rounded-lg overflow-hidden shadow-xl h-full">
             <div className="aspect-video">
               <img 
-                src="/lovable-uploads/60316ede-17f6-45e5-97fc-d095a92778ce.png"
+                src="/lovable-uploads/2ec5b995-fb26-4178-80cf-13c5181d2b7e.png"
                 alt="Dashboard Preview" 
                 className="w-full h-full object-cover"
               />
