@@ -14,13 +14,15 @@ export const useSessionManager = (onSessionChange: (session: Session | null) => 
     const initializeAuth = async () => {
       try {
         const { data: { session: initialSession } } = await supabase.auth.getSession();
-        console.log("Initial session check:", initialSession ? "Found" : "None");
         
         if (!mounted) return;
 
         if (initialSession) {
+          console.log("Initial session: Found active session");
           setSession(initialSession);
           await onSessionChange(initialSession);
+        } else {
+          console.log("Initial session: No active session");
         }
       } catch (error) {
         console.error("Auth initialization error:", error);
@@ -39,7 +41,7 @@ export const useSessionManager = (onSessionChange: (session: Session | null) => 
     initializeAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
-      console.log("Auth state change:", event, newSession ? "Present" : "None");
+      console.log(`Auth state change: ${event}`, newSession ? "Session present" : "No session");
       
       if (!mounted) return;
 

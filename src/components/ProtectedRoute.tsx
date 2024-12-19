@@ -5,11 +5,10 @@ import { Loader2 } from "lucide-react";
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { session, isLoading, isSubscribed } = useAuth();
 
-  console.log("ProtectedRoute - Auth State:", {
+  console.log("ProtectedRoute - State:", {
     isLoading,
     hasSession: !!session,
-    isSubscribed,
-    sessionDetails: session
+    isSubscribed
   });
 
   if (isLoading) {
@@ -22,12 +21,12 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!session) {
-    console.log("No session, redirecting to login");
+    console.log("ProtectedRoute: No session, redirecting to login");
     return <Navigate to="/login" replace />;
   }
 
   if (!isSubscribed) {
-    console.log("Not subscribed, redirecting to membership");
+    console.log("ProtectedRoute: Not subscribed, redirecting to membership");
     return <Navigate to="/" replace />;
   }
 

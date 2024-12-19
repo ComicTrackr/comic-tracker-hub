@@ -14,9 +14,11 @@ function App() {
       <Router>
         <div className="min-h-screen bg-background">
           <Routes>
-            {/* Landing page is Membership */}
+            {/* Public routes */}
             <Route path="/" element={<Membership />} />
             <Route path="/login" element={<Login />} />
+            
+            {/* Protected routes */}
             <Route 
               path="/search" 
               element={
@@ -33,6 +35,7 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+            
             {/* Catch all route - redirect to landing */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

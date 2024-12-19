@@ -7,26 +7,27 @@ export const useSubscriptionCheck = () => {
 
   const checkSubscription = async (userSession: Session | null) => {
     if (!userSession) {
-      console.log("No session provided for subscription check");
+      console.log("Subscription check: No session provided");
       setIsSubscribed(false);
       return;
     }
 
     try {
-      console.log("Checking subscription for user:", userSession.user.id);
+      console.log("Subscription check: Checking status for user", userSession.user.id);
       const { data, error } = await supabase.functions.invoke('is-subscribed', {
         body: { user_id: userSession.user.id }
       });
       
       if (error) {
-        console.error("Subscription check error:", error);
+        console.error("Subscription check failed:", error);
         return;
       }
       
-      setIsSubscribed(!!data?.subscribed);
-      console.log("Subscription status:", data?.subscribed);
+      const hasSubscription = !!data?.subscribed;
+      console.log("Subscription check result:", hasSubscription ? "Active" : "Inactive");
+      setIsSubscribed(hasSubscription);
     } catch (error) {
-      console.error("Error checking subscription:", error);
+      console.error("Subscription check error:", error);
     }
   };
 
