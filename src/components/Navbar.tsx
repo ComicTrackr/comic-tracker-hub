@@ -2,14 +2,36 @@ import { Menu, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 export const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { toast } = useToast();
+  const isDashboard = location.pathname === "/dashboard";
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/login");
+  };
+
+  const handleCancelMembership = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('create-portal-session');
+      if (error) throw error;
+      
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to open subscription management. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -28,6 +50,15 @@ export const Navbar = () => {
         <div className="hidden md:flex items-center space-x-6">
           <a href="/" className="hover:opacity-80 transition-opacity">Home</a>
           <a href="/dashboard" className="hover:opacity-80 transition-opacity">Dashboard</a>
+          {isDashboard && (
+            <Button
+              variant="destructive"
+              className="hover:opacity-80 transition-opacity"
+              onClick={handleCancelMembership}
+            >
+              Cancel Membership
+            </Button>
+          )}
           <Button
             variant="ghost"
             className="hover:opacity-80 transition-opacity flex items-center gap-2"
@@ -49,6 +80,15 @@ export const Navbar = () => {
             <div className="flex flex-col space-y-4 mt-8">
               <a href="/" className="text-lg hover:opacity-80 transition-opacity">Home</a>
               <a href="/dashboard" className="text-lg hover:opacity-80 transition-opacity">Dashboard</a>
+              {isDashboard && (
+                <Button
+                  variant="destructive"
+                  className="hover:opacity-80 transition-opacity"
+                  onClick={handleCancelMembership}
+                >
+                  Cancel Membership
+                </Button>
+              )}
               <Button
                 variant="ghost"
                 className="hover:opacity-80 transition-opacity flex items-center gap-2 justify-start"
