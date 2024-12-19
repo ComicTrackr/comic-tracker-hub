@@ -5,6 +5,7 @@ import { Session } from "@supabase/supabase-js";
 import Index from "@/pages/Index";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
+import Membership from "@/pages/Membership";
 import { Toaster } from "@/components/ui/toaster";
 import "./App.css";
 
@@ -63,6 +64,7 @@ function App() {
           {/* Redirect root to login */}
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/membership" element={<Membership />} />
           <Route
             path="/dashboard"
             element={
