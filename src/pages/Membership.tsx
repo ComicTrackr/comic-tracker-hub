@@ -53,7 +53,7 @@ const Membership = () => {
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           <Card className="p-6 flex flex-col">
             <h3 className="text-2xl font-bold text-orange-800 mb-4">Monthly Plan</h3>
-            <div className="text-3xl font-bold mb-6">$4.99<span className="text-lg text-muted-foreground">/month</span></div>
+            <div className="text-3xl font-bold mb-6">$9.99<span className="text-lg text-muted-foreground">/month</span></div>
             <ul className="space-y-3 mb-8 flex-grow">
               <li className="flex items-center gap-2">
                 <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -84,7 +84,7 @@ const Membership = () => {
               Best Value
             </div>
             <h3 className="text-2xl font-bold text-orange-800 mb-4">Lifetime Access</h3>
-            <div className="text-3xl font-bold mb-6">$14.99<span className="text-lg text-muted-foreground"> one-time</span></div>
+            <div className="text-3xl font-bold mb-6">$99.99<span className="text-lg text-muted-foreground"> one-time</span></div>
             <ul className="space-y-3 mb-8 flex-grow">
               <li className="flex items-center gap-2">
                 <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
