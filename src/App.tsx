@@ -33,6 +33,8 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            {/* Catch all route - redirect to landing */}
+            <Route path="*" element={<Navigate to="/landing" replace />} />
           </Routes>
           <Toaster />
         </div>
