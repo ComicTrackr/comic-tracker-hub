@@ -7,27 +7,33 @@ import { Loader2 } from "lucide-react";
 
 const Index = () => {
   const { session, isLoading, isSubscribed } = useAuth();
-  console.log("Landing page session status:", session ? "Authenticated" : "Not authenticated");
+  console.log("Landing page - Auth State:", {
+    isLoading,
+    hasSession: !!session,
+    isSubscribed
+  });
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-        <Loader2 className="h-8 w-8 animate-spin text-orange-800" />
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
         <p className="text-muted-foreground">Loading your session...</p>
       </div>
     );
   }
 
   if (!session) {
+    console.log("No session found, redirecting to login");
     return <Navigate to="/login" replace />;
   }
 
   if (!isSubscribed) {
+    console.log("User not subscribed, redirecting to membership");
     return <Navigate to="/membership" replace />;
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-background">
       <Navbar />
       <main className="container mx-auto px-4 pt-24 pb-12 space-y-12">
         <Hero />
@@ -48,7 +54,7 @@ const Index = () => {
           </div>
         </div>
       </main>
-    </>
+    </div>
   );
 };
 
