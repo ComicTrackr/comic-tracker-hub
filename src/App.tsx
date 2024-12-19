@@ -17,22 +17,8 @@ function App() {
             <Route path="/" element={<Navigate to="/landing" replace />} />
             <Route path="/login" element={<Login />} />
             <Route path="/membership" element={<Membership />} />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/landing"
-              element={
-                <ProtectedRoute>
-                  <Index />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/landing" element={<Index />} />
             {/* Catch all route - redirect to landing */}
             <Route path="*" element={<Navigate to="/landing" replace />} />
           </Routes>

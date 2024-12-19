@@ -2,10 +2,29 @@ import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { UploadButton } from "@/components/UploadButton";
 import { useAuth } from "@/contexts/AuthContext";
+import { Navigate } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 
 const Index = () => {
-  const { session } = useAuth();
+  const { session, isLoading, isSubscribed } = useAuth();
   console.log("Landing page session status:", session ? "Authenticated" : "Not authenticated");
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+        <Loader2 className="h-8 w-8 animate-spin text-orange-800" />
+        <p className="text-muted-foreground">Loading your session...</p>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!isSubscribed) {
+    return <Navigate to="/membership" replace />;
+  }
 
   return (
     <>
