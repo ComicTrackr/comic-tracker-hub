@@ -81,9 +81,6 @@ const Membership = () => {
         </Card>
 
         <Card className="p-6 flex flex-col border-orange-800 border-2">
-          <div className="absolute -top-3 right-4 bg-orange-800 text-white px-3 py-1 rounded-full text-sm">
-            Best Value
-          </div>
           <h3 className="text-2xl font-bold text-orange-800 mb-4">Lifetime Access</h3>
           <div className="text-3xl font-bold mb-6">$14.99<span className="text-lg text-muted-foreground"> one-time</span></div>
           <ul className="space-y-3 mb-8 flex-grow">
