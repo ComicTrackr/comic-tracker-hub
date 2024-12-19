@@ -23,24 +23,24 @@ const Membership = () => {
         <div className="grid md:grid-cols-2 gap-8 mb-16">
           <div className="rounded-lg overflow-hidden shadow-xl">
             <img 
-              src="https://images.unsplash.com/photo-1498050108023-c5249f4df085"
-              alt="Dashboard Preview" 
-              className="w-full h-64 object-cover"
+              src="/lovable-uploads/e524334c-90d2-45ba-81cc-ab77d0c3402b.png"
+              alt="Homepage Preview" 
+              className="w-full h-auto object-cover"
             />
             <div className="bg-card p-4">
-              <h3 className="font-semibold text-lg mb-2">Smart Dashboard</h3>
-              <p className="text-muted-foreground">Track your collection's value in real-time with our AI-powered analytics.</p>
+              <h3 className="font-semibold text-lg mb-2">Smart Upload</h3>
+              <p className="text-muted-foreground">Easily upload and analyze your comic covers with our AI-powered system.</p>
             </div>
           </div>
           <div className="rounded-lg overflow-hidden shadow-xl">
             <img 
-              src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d"
-              alt="Collection Management" 
-              className="w-full h-64 object-cover"
+              src="/lovable-uploads/60316ede-17f6-45e5-97fc-d095a92778ce.png"
+              alt="Dashboard Preview" 
+              className="w-full h-auto object-cover"
             />
             <div className="bg-card p-4">
-              <h3 className="font-semibold text-lg mb-2">Easy Collection Management</h3>
-              <p className="text-muted-foreground">Add and organize your comics with our intuitive interface.</p>
+              <h3 className="font-semibold text-lg mb-2">Value Tracking</h3>
+              <p className="text-muted-foreground">Track your collection's value with real-time market data.</p>
             </div>
           </div>
         </div>
