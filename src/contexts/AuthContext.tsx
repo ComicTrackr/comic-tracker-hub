@@ -20,18 +20,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        console.log("Initializing auth...");
         const { data: { session: initialSession } } = await supabase.auth.getSession();
-        console.log("Initial session:", initialSession ? "Found" : "None");
+        console.log("Initial auth check - Session:", initialSession ? "Found" : "None");
         setSession(initialSession);
 
         if (initialSession) {
-          console.log("Checking subscription status...");
           const { data, error } = await supabase.functions.invoke('is-subscribed');
-          if (error) {
-            console.error("Subscription check error:", error);
-            throw error;
-          }
+          if (error) throw error;
           console.log("Subscription status:", data.subscribed);
           setIsSubscribed(data.subscribed);
         }
@@ -51,9 +46,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     initializeAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      console.log("Auth state changed:", _event);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event);
       setSession(session);
+      
       if (session) {
         try {
           const { data, error } = await supabase.functions.invoke('is-subscribed');
@@ -63,12 +59,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.error("Error checking subscription:", error);
           setIsSubscribed(false);
         }
+      } else {
+        setIsSubscribed(false);
       }
+      
       setIsLoading(false);
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [toast]);
 
   return (
     <AuthContext.Provider value={{ session, isLoading, isSubscribed }}>

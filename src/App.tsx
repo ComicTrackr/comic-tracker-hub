@@ -15,8 +15,8 @@ function App() {
         <div className="min-h-screen bg-background">
           <Routes>
             <Route path="/" element={<Navigate to="/landing" replace />} />
-            <Route path="/membership" element={<Membership />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/membership" element={<Membership />} />
             <Route
               path="/dashboard"
               element={

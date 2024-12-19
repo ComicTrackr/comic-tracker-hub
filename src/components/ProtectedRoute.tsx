@@ -13,12 +13,12 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!session) {
-    console.log("No session, redirecting to login");
+    console.log("Protected route - No session, redirecting to login");
     return <Navigate to="/login" replace />;
   }
 
   if (!isSubscribed) {
-    console.log("Not subscribed, redirecting to membership");
+    console.log("Protected route - Not subscribed, redirecting to membership");
     return <Navigate to="/membership" replace />;
   }
 
