@@ -50,7 +50,7 @@ const Login = () => {
           if (error) throw error;
           
           if (data.subscribed) {
-            navigate("/landing");
+            navigate("/index");
           } else {
             navigate("/membership");
           }
@@ -98,7 +98,7 @@ const Login = () => {
           if (error) throw error;
           
           if (data.subscribed) {
-            navigate("/landing");
+            navigate("/index");
           } else {
             navigate("/membership");
           }
@@ -136,7 +136,7 @@ const Login = () => {
               }
             }}
             providers={[]}
-            redirectTo={`${window.location.origin}/landing`}
+            redirectTo={`${window.location.origin}/index`}
           />
         </Card>
       </div>
