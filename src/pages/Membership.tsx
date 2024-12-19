@@ -21,23 +21,27 @@ const Membership = () => {
 
         {/* App Screenshots */}
         <div className="grid md:grid-cols-2 gap-8 mb-16">
-          <div className="rounded-lg overflow-hidden shadow-xl">
-            <img 
-              src="/lovable-uploads/e524334c-90d2-45ba-81cc-ab77d0c3402b.png"
-              alt="Homepage Preview" 
-              className="w-full h-auto object-cover"
-            />
+          <div className="rounded-lg overflow-hidden shadow-xl h-full">
+            <div className="aspect-video">
+              <img 
+                src="/lovable-uploads/e524334c-90d2-45ba-81cc-ab77d0c3402b.png"
+                alt="Homepage Preview" 
+                className="w-full h-full object-cover"
+              />
+            </div>
             <div className="bg-card p-4">
               <h3 className="font-semibold text-lg mb-2">Smart Upload</h3>
               <p className="text-muted-foreground">Easily upload and analyze your comic covers with our AI-powered system.</p>
             </div>
           </div>
-          <div className="rounded-lg overflow-hidden shadow-xl">
-            <img 
-              src="/lovable-uploads/60316ede-17f6-45e5-97fc-d095a92778ce.png"
-              alt="Dashboard Preview" 
-              className="w-full h-auto object-cover"
-            />
+          <div className="rounded-lg overflow-hidden shadow-xl h-full">
+            <div className="aspect-video">
+              <img 
+                src="/lovable-uploads/60316ede-17f6-45e5-97fc-d095a92778ce.png"
+                alt="Dashboard Preview" 
+                className="w-full h-full object-cover"
+              />
+            </div>
             <div className="bg-card p-4">
               <h3 className="font-semibold text-lg mb-2">Value Tracking</h3>
               <p className="text-muted-foreground">Track your collection's value with real-time market data.</p>
