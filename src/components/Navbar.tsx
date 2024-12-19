@@ -48,7 +48,7 @@ export const Navbar = () => {
         
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-6">
-          <a href="/" className="hover:opacity-80 transition-opacity">Home</a>
+          <a href="/search" className="hover:opacity-80 transition-opacity">Search</a>
           <a href="/dashboard" className="hover:opacity-80 transition-opacity">Dashboard</a>
           {isDashboard && (
             <Button
@@ -78,7 +78,7 @@ export const Navbar = () => {
           </SheetTrigger>
           <SheetContent>
             <div className="flex flex-col space-y-4 mt-8">
-              <a href="/" className="text-lg hover:opacity-80 transition-opacity">Home</a>
+              <a href="/search" className="text-lg hover:opacity-80 transition-opacity">Search</a>
               <a href="/dashboard" className="text-lg hover:opacity-80 transition-opacity">Dashboard</a>
               {isDashboard && (
                 <Button

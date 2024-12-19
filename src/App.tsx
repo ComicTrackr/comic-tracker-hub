@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Index from "@/pages/Index";
+import Search from "@/pages/Search";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
 import Membership from "@/pages/Membership";
@@ -15,14 +15,13 @@ function App() {
         <div className="min-h-screen bg-background">
           <Routes>
             {/* Redirect root to membership page */}
-            <Route path="/" element={<Navigate to="/membership" replace />} />
-            <Route path="/membership" element={<Membership />} />
+            <Route path="/" element={<Membership />} />
             <Route path="/login" element={<Login />} />
             <Route 
-              path="/index" 
+              path="/search" 
               element={
                 <ProtectedRoute>
-                  <Index />
+                  <Search />
                 </ProtectedRoute>
               } 
             />
@@ -35,7 +34,7 @@ function App() {
               } 
             />
             {/* Catch all route - redirect to membership */}
-            <Route path="*" element={<Navigate to="/membership" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           <Toaster />
         </div>
